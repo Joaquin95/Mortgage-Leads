@@ -4,37 +4,56 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 
 const Dashboard = () => {
   const [leads, setLeads] = useState([]);
+  const [officer, setOfficer] = useState(null);
 
   useEffect(() => {
     const fetchLeads = async () => {
       const user = auth.currentUser;
       if (!user) return;
 
-      // Get officer's ZIPs
+      // Get officer's info
       const officerSnap = await getDocs(
         query(collection(db, "loanOfficers"), where("email", "==", user.email))
       );
 
       if (officerSnap.empty) return;
 
-      const zipCodes = officerSnap.docs[0].data().zipCodes;
+      const officerData = officerSnap.docs[0].data();
+      setOfficer(officerData);
 
-      // Fetch leads that match those ZIPs
-      const leadsSnap = await getDocs(collection(db, "leads"));
-      const matched = leadsSnap.docs
-        .map((doc) => doc.data())
-        .filter((lead) => zipCodes.includes(lead.zip));
+      // Fetch leads assigned to the officer
+      const leadsSnap = await getDocs(
+        query(collection(db, "leads"), where("assignedTo", "==", user.email))
+      );
 
-      setLeads(matched);
+      const myLeads = leadsSnap.docs
+        .map((doc) => doc.data());
+      setLeads(myLeads);
     };
 
     fetchLeads();
   }, []);
 
+  if (!officer) return <p>Loading dashboard...</p>
+
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">My Leads</h1>
-      {leads.map((lead, i) => (
+    <div className="p-6 max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Welcome, {officer.name}</h1>
+          <p>
+        Subscription Tier: <strong>{officer.subscription}</strong> leads/month
+      </p>
+      <p>
+        Leads Used: <strong>{officer.leadsSentThisMonth}</strong>
+      </p>
+      <p>
+        Leads Remaining: <strong>{officer.subscription - officer.leadsSentThisMonth}</strong>
+      </p>
+
+      <h2 className="text-xl font-semibold mt-6 mb-2">My Leads</h2>
+      {leads.length === 0 ? (
+        <p>No leads assigned yet.</p>
+      ) : ( 
+      leads.map((lead, i) => (
         <div key={i} className="bg-white p-4 mb-2 shadow rounded">
           <p>
             <strong>Name:</strong> {lead.name}
@@ -52,7 +71,8 @@ const Dashboard = () => {
             <strong>Amount:</strong> ${lead.amount}
           </p>
         </div>
-      ))}
+      ))
+      )}
     </div>
   );
 };
