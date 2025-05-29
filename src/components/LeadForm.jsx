@@ -1,6 +1,7 @@
 import React, { use, useState } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../services/firebase";
+import emailjs from "emailjs-com";
 
 const Leadform = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +24,22 @@ const Leadform = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Send email notification using EmailJS
+    emailjs.send(
+      process.env.REACT_APP_EMAILJS_SERVICE_ID,
+      process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+      {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        loanType: formData.loanType,
+        zip: formData.zip,
+        creditScore: formData.creditScore,
+        amount: formData.amount,
+      },
+      process.env.REACT_APP_EMAILJS_PUBLIC_KEY
+    );
 
     await addDoc(collection(db, "leads"), {
       ...formData,
