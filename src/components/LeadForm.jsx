@@ -100,9 +100,9 @@ const Leadform = () => {
         className="w-full p-2 border rounded"
       />
       <input
-        name="amount"
+        name="loanAmount"
         placeholder="Loan Amount"
-        value={formData.amount}
+        value={formData.loanAmount}
         onChange={handleChange}
         className="w-full p-2 border rounded"
         required
