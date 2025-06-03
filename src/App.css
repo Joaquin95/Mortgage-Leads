@@ -3,12 +3,12 @@ body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   background-color: #000;
-  color: #fff;
+  color: #dbe3f4;
 }
 
 /* Hero Section */
 .home-wrapper {
-  background: linear-gradient(to bottom right, #1f2937, #000);
+  background: linear-gradient(to bottom right, #698cdf, #000);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -34,7 +34,7 @@ body {
 }
 
 .cta-button {
-  background-color: #22c55e;
+  background-color: #0e54f7;;
   color: white;
   font-size: 1.125rem;
   padding: 0.75rem 1.5rem;
@@ -45,12 +45,12 @@ body {
 }
 
 .cta-button:hover {
-  background-color: #16a34a;
+  background-color: #6d8dd6;
 }
 
 /* Why Choose Section */
 .why-leads {
-  background-color: #111827;
+  background-color: #192744;
   padding: 4rem 1rem;
 }
 
@@ -61,7 +61,7 @@ body {
 
 .why-content h2 {
   font-size: 2rem;
-  color: #4ade80;
+  color: #698cdf;
   margin-bottom: 1.5rem;
 }
 
@@ -78,7 +78,7 @@ body {
 
 /* Trusted Section */
 .trusted {
-  background-color: #1f2937;
+  background-color: #698cdf;;
   padding: 3rem 1rem;
   text-align: center;
 }
@@ -87,4 +87,52 @@ body {
   font-size: 1.5rem;
   font-weight: 600;
   color: #f3f4f6;
+}
+
+/* Header */
+.header {
+  background: #698cdf;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.header nav a {
+  margin-left: 1.5rem;
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.header nav a:hover {
+  color: #0b4fed;; /* green-400 */
+}
+
+
+
+/* Footer */
+.footer {
+  background-color: #698cdf;;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  font-size: .995rem;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+.footer p {
+  color: #024cf8;
+  text-decoration: none;
 }
