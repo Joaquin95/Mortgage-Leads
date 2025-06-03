@@ -6,11 +6,14 @@ import LeadForm from "./components/LeadForm";
 import AdminPanel from "./components/AdminPanel";
 import OfficerSignup from "./components/OfficerSignup";
 import OfficerLogin from "./components/OfficerLogin";
-import "./App.css"; // Assuming you have some global styles
+import Header from "./layout/Header";
+import Footer from "./layout/Footer";
+import "./App.css"; 
 
 function App() {
   return (
     <Router>
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -19,6 +22,7 @@ function App() {
         <Route path="/signup" element={<OfficerSignup />} />
         <Route path="/login" element={<OfficerLogin />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }
