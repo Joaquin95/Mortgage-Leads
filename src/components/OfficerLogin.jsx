@@ -14,27 +14,29 @@ const OfficerLogin = () => {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2>Loan Officer Login</h2>
-      <input
-        className="w-full p-2 my-2 border rounded"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        className="w-full p-2 my-2 border rounded"
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button
-        className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        onClick={handleLogin}
-      >
-        Login
-      </button>
+    <div className="why-leads min-h-screen flex items-center justify-center">
+      <div className="bg-[#0b1a33] p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold text-white mb-4">Loan Officer Login</h2>
+        <input
+          className="w-full p-2 my-2 border border-gray-600 bg-black text-white rounded"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          className="w-full p-2 my-2 border border-gray-600 bg-black text-white rounded"
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button
+          className="cta-button w-full"
+          onClick={handleLogin}
+        >
+          Login
+        </button>
+      </div>
     </div>
   );
 };
