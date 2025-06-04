@@ -117,7 +117,7 @@ body {
   color: #0b4fed;; /* green-400 */
 }
 
-/* LEADFORM */
+/* LEADFORM, Login, And Signup */
 .lead-form {
   max-width: 700px;
   margin: 120px auto; /* center with top space */
@@ -194,6 +194,52 @@ main {
   overflow-y: auto;
   margin-top: 80px;  /* height of header */
   margin-bottom: 60px; /* height of footer */
+}
+
+/* Subscription leads styling */
+.plan-options {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.plan-options h3 {
+  font-size: 20px;
+  color: #1d4ed8;
+  margin-bottom: 20px;
+}
+
+.plan-button {
+  display: block;
+  margin: 10px auto;
+  padding: 12px 20px;
+  width: 100%;
+  max-width: 300px;
+  text-decoration: none;
+  font-weight: 600;
+  color: white;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.plan-button.green {
+  background-color: #16a34a;
+}
+.plan-button.green:hover {
+  background-color: #15803d;
+}
+
+.plan-button.blue {
+  background-color: #2563eb;
+}
+.plan-button.blue:hover {
+  background-color: #1e40af;
+}
+
+.plan-button.purple {
+  background-color: #7c3aed;
+}
+.plan-button.purple:hover {
+  background-color: #5b21b6;
 }
 
 /* Footer */

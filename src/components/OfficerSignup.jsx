@@ -18,43 +18,60 @@ const OfficerSignup = () => {
   };
 
   return (
-    <div className="why-leads min-h-screen flex items-center justify-center">
-      <div className="bg-[#0b1a33] p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-4">Create Account</h2>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSignup();
+      }}
+      className="lead-form"
+    >
+      <h2 className="form-heading">Create Loan Officer Account</h2>
+
+      <div className="form-grid">
         <input
-          className="w-full p-2 my-2 border border-gray-600 bg-black text-white rounded"
+          name="email"
+          type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
-          className="w-full p-2 my-2 border border-gray-600 bg-black text-white rounded"
-          placeholder="Password"
+          name="password"
           type="password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
-        <button
-          className="cta-button w-full"
-          onClick={handleSignup}
-        >
-          Create Account
-        </button>
-
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold text-white mb-2">Choose a Plan</h3>
-          <a className="block p-3 bg-green-600 text-white text-center rounded hover:bg-green-700 my-2" href="https://checkout.stripe.com/pay/YOUR_PLAN_5_LEADS">
-            Starter (5 Leads)
-          </a>
-          <a className="block p-3 bg-blue-600 text-white text-center rounded hover:bg-blue-700 my-2" href="https://checkout.stripe.com/pay/YOUR_PLAN_10_LEADS">
-            Pro (10 Leads)
-          </a>
-          <a className="block p-3 bg-purple-600 text-white text-center rounded hover:bg-purple-700 my-2" href="https://checkout.stripe.com/pay/YOUR_PLAN_20_LEADS">
-            Elite (20 Leads)
-          </a>
-        </div>
       </div>
-    </div>
+
+      <button type="submit" className="submit-button">
+        Create Account
+      </button>
+
+      <div className="plan-options">
+        <h3>Choose a Plan</h3>
+        <a
+          href="https://checkout.stripe.com/pay/YOUR_PLAN_5_LEADS"
+          className="plan-button green"
+        >
+          Starter (5 Leads)
+        </a>
+        <a
+          href="https://checkout.stripe.com/pay/YOUR_PLAN_10_LEADS"
+          className="plan-button blue"
+        >
+          Pro (10 Leads)
+        </a>
+        <a
+          href="https://checkout.stripe.com/pay/YOUR_PLAN_20_LEADS"
+          className="plan-button purple"
+        >
+          Elite (20 Leads)
+        </a>
+      </div>
+    </form>
   );
 };
 
