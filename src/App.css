@@ -1,6 +1,6 @@
 /* Base */
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   margin: 0;
   color: #dbe3f4;
 }
@@ -33,7 +33,7 @@ body {
 }
 
 .cta-button {
-  background-color: #0e54f7;;
+  background-color: #0e54f7;
   color: white;
   font-size: 1.125rem;
   padding: 0.75rem 1.5rem;
@@ -100,7 +100,6 @@ body {
   z-index: 1000;
 }
 
-
 .logo {
   font-size: 1.5rem;
   font-weight: bold;
@@ -114,7 +113,7 @@ body {
 }
 
 .header nav a:hover {
-  color: #0b4fed;; /* green-400 */
+  color: #0b4fed; /* green-400 */
 }
 
 /* LEADFORM, Login, And Signup */
@@ -122,7 +121,7 @@ body {
   max-width: 700px;
   margin: 120px auto; /* center with top space */
   padding: 40px;
-  background:  linear-gradient(to bottom right, #698cdf, #000);
+  background: linear-gradient(to bottom right, #698cdf, #000);
   border-radius: 12px;
   box-shadow: 0 9px 12px rgba(10, 10, 10, 5.1);
   border: 1px solid #ddd;
@@ -192,7 +191,7 @@ select:focus {
 main {
   flex: 1;
   overflow-y: auto;
-  margin-top: 80px;  /* height of header */
+  margin-top: 80px; /* height of header */
   margin-bottom: 60px; /* height of footer */
 }
 
@@ -242,9 +241,55 @@ main {
   background-color: #5b21b6;
 }
 
+/* Dashboard */
+
+.dashboard-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.subscription-card {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  background: #f8f9fa;
+}
+
+.choose-plan .btn {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+  width: 250px;
+}
+
+.starter {
+  background-color: #28a745;
+}
+.pro {
+  background-color: #007bff;
+}
+.elite {
+  background-color: #6f42c1;
+}
+.upgrade-btn {
+  margin-top: 10px;
+  background: orange;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
 /* Footer */
 .footer {
-  background-color: #698cdf;;
+  background-color: #698cdf;
   color: white;
   text-align: center;
   padding: 1rem;
@@ -257,4 +302,3 @@ main {
   color: #ebebeb;
   text-decoration: none;
 }
-
