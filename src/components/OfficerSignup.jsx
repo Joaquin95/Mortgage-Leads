@@ -64,28 +64,6 @@ const OfficerSignup = () => {
       <button type="submit" className="submit-button">
         Create Account
       </button>
-
-      {/* <div className="plan-options">
-        <h3>Choose a Plan</h3>
-        <a
-          href="https://checkout.stripe.com/pay/YOUR_PLAN_5_LEADS"
-          className="plan-button green"
-        >
-          Starter (5 Leads)
-        </a>
-        <a
-          href="https://checkout.stripe.com/pay/YOUR_PLAN_10_LEADS"
-          className="plan-button blue"
-        >
-          Pro (10 Leads)
-        </a>
-        <a
-          href="https://checkout.stripe.com/pay/YOUR_PLAN_20_LEADS"
-          className="plan-button purple"
-        >
-          Elite (20 Leads)
-        </a>
-      </div> */}
     </form>
   );
 };
