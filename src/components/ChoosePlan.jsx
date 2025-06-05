@@ -6,9 +6,9 @@ const ChoosePlan = ({ user }) => {
       <h3>Choose a Plan</h3>
       <p>Select a plan to start receiving Texas mortgage leads.</p>
 
-      <a href="https://buy.stripe.com/test_Starter" className="btn starter">Starter (5 Leads)</a>
-      <a href="https://buy.stripe.com/test_Pro" className="btn pro">Pro (10 Leads)</a>
-      <a href="https://buy.stripe.com/test_Elite" className="btn elite">Elite (20 Leads)</a>
+      <a href="https://checkout.stripe.com/pay/YOUR_PLAN_5_LEADS"className="btn starter">Starter (5 Leads)</a>
+      <a href="https://checkout.stripe.com/pay/YOUR_PLAN_10_LEADS"className="btn pro">Pro (10 Leads)</a>
+      <a href="https://checkout.stripe.com/pay/YOUR_PLAN_20_LEADS"className="btn elite">Elite (20 Leads)</a>
     </div>
   );
 };

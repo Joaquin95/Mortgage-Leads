@@ -32,13 +32,7 @@ const OfficerSignup = () => {
   };
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSignup();
-      }}
-      className="lead-form"
-    >
+    <form onSubmit={handleSignup} className="lead-form">
       <h2 className="form-heading">Create Loan Officer Account</h2>
 
       <div className="form-grid">
@@ -71,7 +65,7 @@ const OfficerSignup = () => {
         Create Account
       </button>
 
-      <div className="plan-options">
+      {/* <div className="plan-options">
         <h3>Choose a Plan</h3>
         <a
           href="https://checkout.stripe.com/pay/YOUR_PLAN_5_LEADS"
@@ -91,7 +85,7 @@ const OfficerSignup = () => {
         >
           Elite (20 Leads)
         </a>
-      </div>
+      </div> */}
     </form>
   );
 };
