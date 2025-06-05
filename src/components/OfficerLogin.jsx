@@ -6,15 +6,33 @@ import { useNavigate } from "react-router-dom";
 const OfficerLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    await signInWithEmailAndPassword(auth, email, password);
-    navigate("/dashboard");
+    setError("");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/dashboard");
+    } catch (err) {
+      if (err.code === "auth/user-not-found") {
+        setError("No account found with this email. Please sign up.");
+      } else if (err.code === "auth/wrong-password") {
+        setError("Incorrect password. Please try again.");
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
+    }
   };
 
   return (
-     <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="lead-form">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleLogin();
+      }}
+      className="lead-form"
+    >
       <h2 className="form-heading">Loan Officer Login</h2>
 
       <div className="form-grid">

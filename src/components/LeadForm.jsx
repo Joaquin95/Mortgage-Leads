@@ -22,6 +22,9 @@ const Leadform = () => {
     loanType: "",
     loanAmount: "",
     creditScore: "",
+    propertyType: "",
+    occupancy: "",
+    homeBuyerType: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -60,7 +63,10 @@ const Leadform = () => {
           loanType: formData.loanType,
           zip: formData.zip,
           creditScore: formData.creditScore,
-          amount: formData.amount,
+          loanAmount: formData.loanAmount,
+          propertyType: formData.propertyType,
+          occupancy: formData.occupancy,
+          homeBuyerType: formData.homeBuyerType,
         },
         process.env.REACT_APP_EMAILJS_PUBLIC_KEY
       );
@@ -141,16 +147,55 @@ const Leadform = () => {
           name="loanType"
           value={formData.loanType}
           onChange={handleChange}
+          required
         >
+          <option value="">Select Loan Type</option>
           <option>Purchase</option>
           <option>Refinance</option>
           <option>FHA</option>
           <option>VA</option>
+          <option>Home Equity</option>
+          <option>Home improvement</option>
+        </select>
+        <select
+          name="propertyType"
+          value={formData.propertyType}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Property Type</option>
+          <option>Single Family</option>
+          <option>Multi Family</option>
+          <option>FHA</option>
+          <option>VA</option>
+          <option>Condo</option>
+          <option>Manufactured or Mobile</option>
+        </select>
+        <select
+          name="occupancy"
+          value={formData.occupancy}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Occupancy</option>
+          <option>Primary Home</option>
+          <option>Secondary Home</option>
+          <option>Investment Property</option>
+        </select>
+        <select
+          name="homeBuyerType"
+          value={formData.homeBuyerType}
+          onChange={handleChange}
+          required
+        >
+          <option value="">First-time Homebuyer?</option>
+          <option>Yes</option>
+          <option>No</option>
         </select>
       </div>
 
       <button type="submit" className="submit-button">
-        🚀 Get My Free Quote
+        🚀 Get my Mortgage Quote
       </button>
     </form>
   );

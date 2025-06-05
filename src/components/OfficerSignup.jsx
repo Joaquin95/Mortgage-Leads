@@ -11,12 +11,27 @@ const OfficerSignup = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const isPasswordStrong = (password) => {
+    const regex =
+       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\S]{8,}$/;
+    return regex.test(password);
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
+    if (!isPasswordStrong(password)) {
+      setError(
+        "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+      );
+      return;
+    }
+
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -25,6 +40,7 @@ const OfficerSignup = () => {
         leadsSentThisMonth: 0,
         subscription: null,
       });
+
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
