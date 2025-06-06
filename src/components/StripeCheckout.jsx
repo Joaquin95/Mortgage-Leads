@@ -6,7 +6,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 export default function StripeCheckout({ priceId, userEmail }) {
     const handleCheckout = async () => {
         const stripe = await stripePromise;
-        const res = await fetch('/create-checout-session', {
+        const res = await fetch('/create-checkout-session', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
