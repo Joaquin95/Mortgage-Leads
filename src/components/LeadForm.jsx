@@ -49,9 +49,26 @@ const Leadform = () => {
       ); // Filter eligible loan officers based on leads sent and subscription limit
       eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth); // Sort by leads sent
 
+          let chosen;
+
       if (eligible.length > 0) {
-        const chosen = eligible[0]; // Choose the officer with the least leads sent
-        console.log("Chosen Officer:", chosen);
+        chosen = eligible[0]; // Choose the officer with the least leads sent
+
+          await updateDoc(doc(db, "loanOfficers", chosen.id), {
+        leadsSentThisMonth: chosen.leadsSentThisMonth + 1,
+        lastLeadSent: new Date().toISOString(),
+      });
+        
+       console.log("Chosen officer:", chosen.email);
+    } else {
+      // No eligible officers, use fallback (me)
+      chosen = {
+        email: process.env.REACT_APP_FALLBACK_OFFICER_EMAIL,
+        name: process.env.REACT_APP_FALLBACK_OFFICER_NAME,
+      };
+
+      console.log("No eligible officers. Fallback to:", chosen.email);
+    }
         // Send email notification using EmailJS
         await emailjs.send(
           process.env.REACT_APP_EMAILJS_SERVICE_ID,
@@ -72,24 +89,13 @@ const Leadform = () => {
           },
           process.env.REACT_APP_EMAILJS_PUBLIC_KEY
         );
-        console.log("Email sent!");
+       
 
         await addDoc(collection(db, "leads"), {
           ...formData,
           assignedTo: chosen.email,
           createdAt: serverTimestamp(),
         });
-        console.log("Lead saved!");
-
-        await updateDoc(doc(db, "loanOfficers", chosen.id), {
-          leadsSentThisMonth: chosen.leadsSentThisMonth + 1, // Increment the leads sent count for the chosen officer
-          lastLeadSent: new Date().toISOString(),
-        });
-
-        console.log("Officer updated!");
-      } else {
-        console.warn("No eligible officers found.");
-      }
 
       setSubmitted(true);
     } catch (err) {
