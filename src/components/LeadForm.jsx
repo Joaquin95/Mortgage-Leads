@@ -36,54 +36,65 @@ const Leadform = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const q = query(collection(db, "loanOfficers"));
-    const snapshot = await getDocs(q);
-    const officers = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })); // Fetch loan officers from Firestore
-    const eligible = officers.filter(
-      (o) => o.leadsSentThisMonth < o.subscription
-    ); // Filter eligible loan officers based on leads sent and subscription limit
-    eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth); // Sort by leads sent
+    try {
+      const q = query(collection(db, "loanOfficers"));
+      const snapshot = await getDocs(q);
 
-    if (eligible.length > 0) {
-      const chosen = eligible[0]; // Choose the officer with the least leads sent
+      const officers = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })); // Fetch loan officers from Firestore
+      const eligible = officers.filter(
+        (o) => o.leadsSentThisMonth < o.subscription
+      ); // Filter eligible loan officers based on leads sent and subscription limit
+      eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth); // Sort by leads sent
 
-      // Send email notification using EmailJS
-      await emailjs.send(
-        process.env.REACT_APP_EMAILJS_SERVICE_ID,
-        process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
-        {
-          officerEmail: chosen.email,
-          officerName: chosen.name,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          loanType: formData.loanType,
-          zip: formData.zip,
-          creditScore: formData.creditScore,
-          loanAmount: formData.loanAmount,
-          propertyType: formData.propertyType,
-          occupancy: formData.occupancy,
-          homeBuyerType: formData.homeBuyerType,
-        },
-        process.env.REACT_APP_EMAILJS_PUBLIC_KEY
-      );
+      if (eligible.length > 0) {
+        const chosen = eligible[0]; // Choose the officer with the least leads sent
+        console.log("Chosen Officer:", chosen);
+        // Send email notification using EmailJS
+        await emailjs.send(
+          process.env.REACT_APP_EMAILJS_SERVICE_ID,
+          process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+          {
+            officerEmail: chosen.email,
+            officerName: chosen.name,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            loanType: formData.loanType,
+            zip: formData.zip,
+            creditScore: formData.creditScore,
+            loanAmount: formData.loanAmount,
+            propertyType: formData.propertyType,
+            occupancy: formData.occupancy,
+            homeBuyerType: formData.homeBuyerType,
+          },
+          process.env.REACT_APP_EMAILJS_PUBLIC_KEY
+        );
+        console.log("Email sent!");
 
-      await addDoc(collection(db, "leads"), {
-        ...formData,
-        assignedTo: chosen.email,
-        createdAt: serverTimestamp(),
-      });
+        await addDoc(collection(db, "leads"), {
+          ...formData,
+          assignedTo: chosen.email,
+          createdAt: serverTimestamp(),
+        });
+        console.log("Lead saved!");
 
-      await updateDoc(doc(db, "loanOfficers", chosen.id), {
-        leadsSentThisMonth: chosen.leadsSentThisMonth + 1, // Increment the leads sent count for the chosen officer
-        lastLeadSent: new Date().toISOString(),
-      });
+        await updateDoc(doc(db, "loanOfficers", chosen.id), {
+          leadsSentThisMonth: chosen.leadsSentThisMonth + 1, // Increment the leads sent count for the chosen officer
+          lastLeadSent: new Date().toISOString(),
+        });
+
+        console.log("Officer updated!");
+      } else {
+        console.warn("No eligible officers found.");
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Submission error:", err);
     }
-
-    setSubmitted(true);
   }; // This function handles form submission, sends an email notification, and saves the lead to Firestore.
   // If the form has been submitted, show a thank you message
   if (submitted) {
