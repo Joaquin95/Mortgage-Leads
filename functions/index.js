@@ -1,19 +1,51 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const nodemailer = require("nodemailer");
 
-// const {onRequest} = require("firebase-functions/v2/https");
-// const logger = require("firebase-functions/logger");
+admin.initializeApp();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: functions.config().gmail.user,
+    pass: functions.config().gmail.pass,
+  },
+});
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+exports.sendLeadEmail = functions.https.onCall(async (data, context) => {
+  const {
+    officerEmail,
+    officerName,
+    name,
+    email,
+    phone,
+    loanType,
+    zip,
+    creditScore,
+    loanAmount,
+    propertyType,
+    occupancy,
+    homeBuyerType,
+  } = data;
+
+  const mailOptions = {
+    from: functions.config().gmail.user,
+    to: officerEmail,
+    subject: "New Mortgage Lead Assigned",
+    text: `Lead Info:
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+Loan Type: ${loanType}
+Loan Amount: ${loanAmount}
+Credit Score: ${creditScore}
+ZIP: ${zip}
+Property Type: ${propertyType}
+Occupancy: ${occupancy}
+First Time Buyer: ${homeBuyerType}
+Assigned To: ${officerName}`,
+  };
+
+  await transporter.sendMail(mailOptions);
+  return {success: true}; // Return success response
+});

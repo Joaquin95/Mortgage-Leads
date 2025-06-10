@@ -8,8 +8,9 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { db } from "../services/firebase";
-import emailjs from "emailjs-com";
+import { app } from "../services/firebase";
 
 const Leadform = () => {
   const [formData, setFormData] = useState({
@@ -49,53 +50,50 @@ const Leadform = () => {
       ); // Filter eligible loan officers based on leads sent and subscription limit
       eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth); // Sort by leads sent
 
-          let chosen;
+      let chosen;
 
       if (eligible.length > 0) {
         chosen = eligible[0]; // Choose the officer with the least leads sent
 
-          await updateDoc(doc(db, "loanOfficers", chosen.id), {
-        leadsSentThisMonth: chosen.leadsSentThisMonth + 1,
-        lastLeadSent: new Date().toISOString(),
-      });
-        
-       console.log("Chosen officer:", chosen.email);
-    } else {
-      // No eligible officers, use fallback (me)
-      chosen = {
-        email: process.env.REACT_APP_FALLBACK_OFFICER_EMAIL,
-        name: process.env.REACT_APP_FALLBACK_OFFICER_NAME,
-      };
-
-      console.log("No eligible officers. Fallback to:", chosen.email);
-    }
-        // Send email notification using EmailJS
-        await emailjs.send(
-          process.env.REACT_APP_EMAILJS_SERVICE_ID,
-          process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
-          {
-            officerEmail: chosen.email,
-            officerName: chosen.name,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            loanType: formData.loanType,
-            zip: formData.zip,
-            creditScore: formData.creditScore,
-            loanAmount: formData.loanAmount,
-            propertyType: formData.propertyType,
-            occupancy: formData.occupancy,
-            homeBuyerType: formData.homeBuyerType,
-          },
-          process.env.REACT_APP_EMAILJS_PUBLIC_KEY
-        );
-       
-
-        await addDoc(collection(db, "leads"), {
-          ...formData,
-          assignedTo: chosen.email,
-          createdAt: serverTimestamp(),
+        await updateDoc(doc(db, "loanOfficers", chosen.id), {
+          leadsSentThisMonth: chosen.leadsSentThisMonth + 1,
+          lastLeadSent: new Date().toISOString(),
         });
+
+        console.log("Chosen officer:", chosen.email);
+      } else {
+        // No eligible officers, use fallback (me)
+        chosen = {
+          email: process.env.REACT_APP_FALLBACK_OFFICER_EMAIL,
+          name: process.env.REACT_APP_FALLBACK_OFFICER_NAME,
+        };
+
+        console.log("No eligible officers. Fallback to:", chosen.email);
+      }
+      // Send email notification using EmailJS
+      const functions = getFunctions(app);
+      const sendLeadEmail = httpsCallable(functions, "sendLeadEmail");
+
+      await sendLeadEmail({
+        officerEmail: chosen.email,
+        officerName: chosen.name,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        loanType: formData.loanType,
+        zip: formData.zip,
+        creditScore: formData.creditScore,
+        loanAmount: formData.loanAmount,
+        propertyType: formData.propertyType,
+        occupancy: formData.occupancy,
+        homeBuyerType: formData.homeBuyerType,
+      });
+
+      await addDoc(collection(db, "leads"), {
+        ...formData,
+        assignedTo: chosen.email,
+        createdAt: serverTimestamp(),
+      });
 
       setSubmitted(true);
     } catch (err) {
