@@ -1,16 +1,10 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
 
 admin.initializeApp();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: functions.config().gmail.user,
-    pass: functions.config().gmail.pass,
-  },
-});
+sgMail.setApiKey(functions.config().sendgrid.key);
 
 exports.sendLeadEmail = functions.https.onCall(async (data, context) => {
   const {
@@ -28,9 +22,9 @@ exports.sendLeadEmail = functions.https.onCall(async (data, context) => {
     homeBuyerType,
   } = data;
 
-  const mailOptions = {
-    from: functions.config().gmail.user,
+  const msg = {
     to: officerEmail,
+    from: functions.config().sendgrid.from,
     subject: "New Mortgage Lead Assigned",
     text: `Lead Info:
 Name: ${name}
@@ -46,6 +40,6 @@ First Time Buyer: ${homeBuyerType}
 Assigned To: ${officerName}`,
   };
 
-  await transporter.sendMail(mailOptions);
-  return {success: true}; // Return success response
+  await sgMail.send(msg);
+  return {success: true};
 });
