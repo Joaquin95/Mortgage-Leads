@@ -7,6 +7,32 @@ admin.initializeApp();
 sgMail.setApiKey(functions.config().sendgrid.key);
 
 exports.sendLeadEmail = functions.https.onCall(async (data, context) => {
+    const { email, plan } = data;
+
+  const prices = {
+    starter: "prod_SPOwecsy9eauea",  
+    pro: "prod_SPOxoiTd5o5cJw",
+    elite: "prod_SPOxgSfhsDjH58"
+  };
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "subscription",
+    line_items: [
+      {
+        price: prices[plan],
+        quantity: 1,
+      },
+    ],
+    success_url: "https://your-vercel-domain.vercel.app/dashboard?success=true",
+    cancel_url: "https://your-vercel-domain.vercel.app/dashboard?cancelled=true",
+    customer_email: email,
+  });
+
+  return { url: session.url };
+});
+
+
   const {
     officerEmail,
     officerName,

@@ -1,17 +1,50 @@
-import React from "react";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { app } from "../services/firebase";
+import { useAuth } from "../hooks/useAuth";
 
-const ChoosePlan = ({ user }) => {
+const ChoosePlan = () => {
+  const { currentUser } = useAuth();
+
+  const handleSubscribe = async (plan) => {
+    const functions = getFunctions(app);
+    const createCheckoutSession = httpsCallable(
+      functions,
+      "createCheckoutSession"
+    );
+    const result = await createCheckoutSession({
+      email: currentUser.email,
+      plan,
+    });
+
+    window.location.href = result.data.url; // Redirect to Stripe checkout
+  };
+
   return (
     <div className="plan-options">
       <h3>Choose a Plan</h3>
       <p>Select a plan to start receiving Texas mortgage leads.</p>
 
-      <a href="https://checkout.stripe.com/pay/YOUR_PLAN_5_LEADS"className="plan-button green">Starter (5 Leads)</a>
-      <a href="https://checkout.stripe.com/pay/YOUR_PLAN_10_LEADS"className="plan-button blue">Pro (10 Leads)</a>
-      <a href="https://checkout.stripe.com/pay/YOUR_PLAN_20_LEADS"className="plan-button purple">Elite (20 Leads)</a>
+      <button
+        onClick={() => handleSubscribe("starter")}
+        className="plan-button green"
+      >
+        Starter (5 Leads)
+      </button>
+      <button
+        onClick={() => handleSubscribe("pro")}
+        className="plan-button blue"
+      >
+        Pro (10 Leads)
+      </button>
+      <button
+        onClick={() => handleSubscribe("elite")}
+        className="plan-button purple"
+      >
+        Elite (20 Leads)
+      </button>
     </div>
   );
 };
 
 export default ChoosePlan;
-// Note: Replace the href links with your actual Stripe checkout links for each plan.
+
