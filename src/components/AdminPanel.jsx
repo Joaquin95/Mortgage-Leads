@@ -1,24 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../services/firebase";
 import { getDocs, collection, updateDoc, doc } from "firebase/firestore";
+import { useAuth } from "../hooks/useAuth"; 
 
 const AdminPanel = () => {
+  const { currentUser } = useAuth();
+
+  if (!currentUser || currentUser.email !== "Mintinvestments95@gmail.com") {
+    return <p className="text-white p-4">❌ Access Denied</p>;
+  }
+
   const [officers, setOfficers] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const snap = await getDocs(collection(db, "loanOfficers"));
-      setOfficers(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      try {
+        const snap = await getDocs(collection(db, "loanOfficers"));
+        setOfficers(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      } catch (err) {
+        console.error("Error fetching loan officers:", err);
+      }
     };
     fetchData();
   }, []);
 
   const resetLeads = async (id) => {
-    await updateDoc(doc(db, "loanOfficers", id), { leadsSentThisMonth: 0 });
+    try {
+      await updateDoc(doc(db, "loanOfficers", id), { leadsSentThisMonth: 0 });
+    } catch (err) {
+      console.error("Error resetting leads:", err);
+    }
   };
 
   const upgradePlan = async (id, newPlan) => {
-    await updateDoc(doc(db, "loanOfficers", id), { subscription: newPlan });
+    try {
+      await updateDoc(doc(db, "loanOfficers", id), { subscription: newPlan });
+    } catch (err) {
+      console.error("Error upgrading plan:", err);
+    }
   };
 
   return (

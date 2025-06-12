@@ -23,10 +23,8 @@ exports.createCheckoutSession = functions.https.onCall(
           quantity: 1,
         },
       ],
-      success_url:
-        "https://your-vercel-domain.vercel.app/dashboard?success=true",
-      cancel_url:
-        "https://your-vercel-domain.vercel.app/dashboard?cancelled=true",
+      success_url: "https://mortgage-leads.vercel.app//dashboard?success=true",
+      cancel_url: "https://mortgage-leads.vercel.app//dashboard?cancelled=true",
       customer_email: email,
     });
 
