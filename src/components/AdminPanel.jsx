@@ -1,22 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../services/firebase";
 import { getDocs, collection, updateDoc, doc } from "firebase/firestore";
-import { useAuth } from "../hooks/useAuth"; 
+import { useAuth } from "../services/useAuth";
 
 const AdminPanel = () => {
   const { currentUser } = useAuth();
-
-  if (!currentUser || currentUser.email !== "Mintinvestments95@gmail.com") {
-    return <p className="text-white p-4">❌ Access Denied</p>;
-  }
-
   const [officers, setOfficers] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const snap = await getDocs(collection(db, "loanOfficers"));
-        setOfficers(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setOfficers(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
       } catch (err) {
         console.error("Error fetching loan officers:", err);
       }
@@ -40,13 +35,23 @@ const AdminPanel = () => {
     }
   };
 
+  if (!currentUser || currentUser.email !== "Mintinvestments95@gmail.com") {
+    return <p className="text-white p-4">❌ Access Denied</p>;
+  }
+
   return (
     <div className="why-leads min-h-screen p-8">
       <h1 className="text-3xl font-bold text-white mb-6">Admin Panel</h1>
       {officers.map((o) => (
-        <div key={o.id} className="bg-[#0b1a33] border border-gray-600 p-4 mb-4 rounded-lg">
+        <div
+          key={o.id}
+          className="bg-[#0b1a33] border border-gray-600 p-4 mb-4 rounded-lg"
+        >
           <p className="text-white font-medium">Email: {o.email}</p>
-          <p className="text-white">Subscription: <span className="text-blue-300">{o.subscription || "None"}</span></p>
+          <p className="text-white">
+            Subscription:{" "}
+            <span className="text-blue-300">{o.subscription || "None"}</span>
+          </p>
           <p className="text-white">Leads Used: {o.leadsSentThisMonth}</p>
           <div className="flex gap-4 mt-2">
             <button

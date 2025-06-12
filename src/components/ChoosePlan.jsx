@@ -1,6 +1,6 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { app } from "../services/firebase";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../services/useAuth";
 
 const ChoosePlan = () => {
   const { currentUser } = useAuth();
