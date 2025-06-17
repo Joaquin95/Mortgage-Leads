@@ -1,12 +1,16 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const stripe = require("stripe")(functions.config().stripe.secret_key);
+const functions = require("firebase-functions/v1");
 
-admin.initializeApp();
+exports.createCheckoutSession = functions
+  .region("us-central1")
+  .runWith({
+    timeoutSeconds: 60,
+    memory: "256MB",
+    secrets: ["STRIPE_SECRET_KEY"],
+  })
+  .https.onRequest(async (req, res) => {
+    const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-exports.createCheckoutSession = functions.https.onCall(
-  async (data, context) => {
-    const { email, plan } = data;
+    const { email, plan } = req.body;
 
     const prices = {
       starter: "price_1RUa8hFmfJpxrjsaf7d37wWg",
@@ -14,20 +18,24 @@ exports.createCheckoutSession = functions.https.onCall(
       elite: "price_1RUa9lFmfJpxrjsapCiRe3s8",
     };
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "subscription",
-      line_items: [
-        {
-          price: prices[plan],
-          quantity: 1,
-        },
-      ],
-      success_url: "https://mortgage-leads.vercel.app//dashboard?success=true",
-      cancel_url: "https://mortgage-leads.vercel.app//dashboard?cancelled=true",
-      customer_email: email,
-    });
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "subscription",
+        line_items: [
+          {
+            price: prices[plan],
+            quantity: 1,
+          },
+        ],
+        success_url: "https://mortgage-leads.vercel.app/dashboard?success=true",
+        cancel_url: "https://mortgage-leads.vercel.app/dashboard?cancelled=true",
+        customer_email: email,
+      });
 
-    return { url: session.url };
-  }
-);
+      res.status(200).json({ url: session.url });
+    } catch (error) {
+      console.error("Stripe error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
