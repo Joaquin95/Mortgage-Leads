@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-const sgMail = require("@sendgrid/mail");
+const sgMail = require("@sendGrid/mail");
 
 // ✅ Basic helloWorld test route
 exports.helloWorld = functions.https.onRequest((req, res) => {
@@ -9,8 +9,8 @@ exports.helloWorld = functions.https.onRequest((req, res) => {
 // ✅ sendLeadEmail Cloud Function (Gen 1 HTTPS Callable)
 exports.sendLeadEmail = functions.https.onCall(async (data, context) => {
   // ✅ Load SendGrid API key INSIDE the function
-  const apiKey = functions.config().sendgrid.api_key;
-  const fromEmail = functions.config().sendgrid.from_email;
+  const apiKey = functions.config().sendGrid.api_key;
+  const fromEmail = functions.config().sendGrid.from_email;
 
   if (!apiKey || !fromEmail) {
     console.error("Missing SendGrid config.");
