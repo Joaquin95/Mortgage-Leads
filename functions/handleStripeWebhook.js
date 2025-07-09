@@ -1,0 +1,50 @@
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const stripe = require("stripe")(functions.config().stripe.secret_key);
+
+admin.initializeApp();
+
+exports.handleStripeWebhook = functions.https.onRequest(async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  const endpointSecret = functions.config().stripe.webhook_secret;
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+  } catch (err) {
+    console.error("Webhook signature error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+
+    const uid = session.metadata.firebaseUID;
+    const customerEmail = session.customer_email;
+
+    let subscriptionAmount = 5;
+    if (session.amount_total === 1000) subscriptionAmount = 10;
+    else if (session.amount_total === 2000) subscriptionAmount = 20;
+
+    try {
+      await admin.firestore().collection("loanOfficers").doc(uid).set(
+        {
+          email: customerEmail,
+          subscription: subscriptionAmount,
+          leadsSentThisMonth: 0,
+          subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      console.log("✅ Subscription updated for:", customerEmail);
+      res.json({ received: true });
+    } catch (err) {
+      console.error("Firestore update error:", err);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    res.json({ received: true });
+  }
+});
