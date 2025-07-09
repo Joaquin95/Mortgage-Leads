@@ -9,8 +9,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { db } from "../services/firebase";
-import { app } from "../services/firebase";
+import { db, app } from "../services/firebase";
 
 const Leadform = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +31,7 @@ const Leadform = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  }; // This function updates the form data state when the user types in the input fields.
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,16 +43,18 @@ const Leadform = () => {
       const officers = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      })); // Fetch loan officers from Firestore
+      }));
+
       const eligible = officers.filter(
         (o) => o.leadsSentThisMonth < o.subscription
-      ); // Filter eligible loan officers based on leads sent and subscription limit
-      eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth); // Sort by leads sent
+      );
+
+      eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth);
 
       let chosen;
 
       if (eligible.length > 0) {
-        chosen = eligible[0]; // Choose the officer with the least leads sent
+        chosen = eligible[0];
 
         await updateDoc(doc(db, "loanOfficers", chosen.id), {
           leadsSentThisMonth: chosen.leadsSentThisMonth + 1,
@@ -62,15 +63,15 @@ const Leadform = () => {
 
         console.log("Chosen officer:", chosen.email);
       } else {
-        // No eligible officers, use fallback (me)
         chosen = {
-          email: process.env.REACT_APP_FALLBACK_OFFICER_EMAIL,
-          name: process.env.REACT_APP_FALLBACK_OFFICER_NAME,
+          email: process.env.REACT_APP_FALLBACK_OFFICER_EMAIL || "Mintinvestments95@gmail.com",
+          name: process.env.REACT_APP_FALLBACK_OFFICER_NAME || "Fallback Officer",
         };
 
         console.log("No eligible officers. Fallback to:", chosen.email);
       }
-      // Send email notification using EmailJS
+
+      // ✅ Call the Cloud Function using httpsCallable
       const functions = getFunctions(app);
       const sendLeadEmail = httpsCallable(functions, "sendLeadEmail");
 
@@ -97,10 +98,11 @@ const Leadform = () => {
 
       setSubmitted(true);
     } catch (err) {
-      console.error("Submission error:", err);
+      console.error("Submission error:", err.message || err);
+      alert("❌ Something went wrong. Please try again later.");
     }
-  }; // This function handles form submission, sends an email notification, and saves the lead to Firestore.
-  // If the form has been submitted, show a thank you message
+  };
+
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
@@ -113,57 +115,17 @@ const Leadform = () => {
 
   return (
     <form onSubmit={handleSubmit} className="lead-form">
-      <h2 className="from-heading ">🏡 Request a Free Mortgage Quote</h2>
+      <h2 className="from-heading">🏡 Request a Free Mortgage Quote</h2>
 
       <div className="form-grid">
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="phone"
-          placeholder="Phone Number"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="zip"
-          placeholder="Property ZIP Code"
-          value={formData.zip}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="creditScore"
-          placeholder="Estimated Credit Score"
-          value={formData.creditScore}
-          onChange={handleChange}
-        />
-        <input
-          name="loanAmount"
-          placeholder="Loan Amount"
-          value={formData.loanAmount}
-          onChange={handleChange}
-          required
-        />
-        <select
-          name="loanType"
-          value={formData.loanType}
-          onChange={handleChange}
-          required
-        >
+        <input name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
+        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+        <input name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} required />
+        <input name="zip" placeholder="Property ZIP Code" value={formData.zip} onChange={handleChange} required />
+        <input name="creditScore" placeholder="Estimated Credit Score" value={formData.creditScore} onChange={handleChange} />
+        <input name="loanAmount" placeholder="Loan Amount" value={formData.loanAmount} onChange={handleChange} required />
+
+        <select name="loanType" value={formData.loanType} onChange={handleChange} required>
           <option value="">Select Loan Type</option>
           <option>Purchase</option>
           <option>Refinance</option>
@@ -172,12 +134,8 @@ const Leadform = () => {
           <option>Home Equity</option>
           <option>Home improvement</option>
         </select>
-        <select
-          name="propertyType"
-          value={formData.propertyType}
-          onChange={handleChange}
-          required
-        >
+
+        <select name="propertyType" value={formData.propertyType} onChange={handleChange} required>
           <option value="">Property Type</option>
           <option>Single Family</option>
           <option>Multi Family</option>
@@ -186,23 +144,15 @@ const Leadform = () => {
           <option>Condo</option>
           <option>Manufactured or Mobile</option>
         </select>
-        <select
-          name="occupancy"
-          value={formData.occupancy}
-          onChange={handleChange}
-          required
-        >
+
+        <select name="occupancy" value={formData.occupancy} onChange={handleChange} required>
           <option value="">Occupancy</option>
           <option>Primary Home</option>
           <option>Secondary Home</option>
           <option>Investment Property</option>
         </select>
-        <select
-          name="homeBuyerType"
-          value={formData.homeBuyerType}
-          onChange={handleChange}
-          required
-        >
+
+        <select name="homeBuyerType" value={formData.homeBuyerType} onChange={handleChange} required>
           <option value="">First-time Homebuyer?</option>
           <option>Yes</option>
           <option>No</option>
@@ -217,4 +167,3 @@ const Leadform = () => {
 };
 
 export default Leadform;
-// This component is a simple lead form for mortgage quotes.

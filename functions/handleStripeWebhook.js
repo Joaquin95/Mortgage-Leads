@@ -1,13 +1,19 @@
+const { onRequest } = require("firebase-functions/v2/https");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const stripe = require("stripe")(functions.config().stripe.secret_key);
+const stripe = require("stripe")(functions.config().stripe.secret);
 
 const endpointSecret = functions.config().stripe.webhook_secret;
 
-exports.handleStripeWebhook = functions.https.onRequest(async (req, res) => {
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
+exports.handleStripeWebhook = onRequest({ region: "us-central1", rawRequest: true }, async (req, res) => {
   const sig = req.headers["stripe-signature"];
 
   let event;
+
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
@@ -25,20 +31,17 @@ exports.handleStripeWebhook = functions.https.onRequest(async (req, res) => {
     };
 
     try {
-      const checkoutSession = await stripe.checkout.sessions.retrieve(session.id, {
-        expand: ["line_items"],
-      });
-
-      const priceId = checkoutSession.line_items.data[0].price.id;
+      const priceId = session?.items?.data?.[0]?.price?.id;
       const plan = planMap[priceId] || "starter";
       const email = session.customer_email;
 
-      const snapshot = await admin.firestore()
+      const snapshot = await admin
+        .firestore()
         .collection("loanOfficers")
         .where("email", "==", email)
         .get();
 
-      snapshot.forEach(doc => {
+      snapshot.forEach((doc) => {
         doc.ref.update({
           subscription: plan,
           leadsSentThisMonth: 0,
@@ -47,7 +50,7 @@ exports.handleStripeWebhook = functions.https.onRequest(async (req, res) => {
 
       console.log(`✅ Updated subscription for ${email} to ${plan}`);
     } catch (err) {
-      console.error("❌ Error handling webhook logic:", err);
+      console.error("❌ Error updating Firestore:", err.message);
       return res.status(500).send("Internal Server Error");
     }
   }
