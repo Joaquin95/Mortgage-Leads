@@ -1,16 +1,12 @@
 const { onRequest } = require("firebase-functions/v2/https");
-const admin = require("firebase-admin");
+const admin = require("./initAdmin");
 const Stripe = require("stripe");
 
-admin.initializeApp();
-
-// Initialize Stripe inside the function scope, using process.env for secret
-// Stripe client must be created inside the exported function to guarantee env var availability
 
 exports.handleStripeWebhook = onRequest(
   { secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"] },
   async (req, res) => {
-    // Create Stripe instance here
+   
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const sig = req.headers["stripe-signature"];

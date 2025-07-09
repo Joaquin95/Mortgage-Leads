@@ -1,11 +1,16 @@
 const { onCall } = require("firebase-functions/v2/https");
-const admin = require("firebase-admin");
-const Stripe = require("stripe");
-
-admin.initializeApp();
+const admin = require("./initAdmin");
+const Stripe = require("stripe");Sk
 
 exports.createCheckoutSession = onCall(
-  { secrets: ["STRIPE_SECRET_KEY"] },
+  {
+    secrets: [
+      "STRIPE_SECRET_KEY",
+      "PRICE_BASIC",
+      "PRICE_STANDARD",
+      "PRICE_PREMIUM",
+    ],
+  },
   async (req) => {
     const { email, subscriptionType } = req.data;
     const auth = req.auth;
@@ -16,11 +21,10 @@ exports.createCheckoutSession = onCall(
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    // Map subscriptionType to Stripe price IDs (replace these with your actual secret values or use `functions.config().stripe[...]` if you've set them that way)
     const priceMap = {
-      basic: "price_123", // Replace with your actual Stripe price ID
-      standard: "price_456",
-      premium: "price_789",
+      basic: process.env.PRICE_BASIC,
+      standard: process.env.PRICE_STANDARD,
+      premium: process.env.PRICE_PREMIUM,
     };
 
     const priceId = priceMap[subscriptionType];
