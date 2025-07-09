@@ -1,6 +1,6 @@
 const { onCall } = require("firebase-functions/v2/https");
 const admin = require("./initAdmin");
-const Stripe = require("stripe");Sk
+const Stripe = require("stripe");
 
 exports.createCheckoutSession = onCall(
   {
