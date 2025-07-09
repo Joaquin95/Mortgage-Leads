@@ -72,7 +72,7 @@ const Leadform = () => {
       }
 
       // ✅ Call the Cloud Function using httpsCallable
-      const functions = getFunctions(app);
+      const functions = getFunctions(app, "us-central1");
       const sendLeadEmail = httpsCallable(functions, "sendLeadEmail");
 
       await sendLeadEmail({

@@ -3,6 +3,7 @@ const { onCall } = require("firebase-functions/v2/https");
 const sgMail = require("@sendgrid/mail");
 const functions = require("firebase-functions");
 
+
 sgMail.setApiKey(functions.config().sendgrid.api_key);
 
 exports.sendLeadEmail = onCall({ region: "us-central1" }, async (data, context) => {
