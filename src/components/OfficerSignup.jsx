@@ -6,6 +6,7 @@ import { doc, setDoc } from "firebase/firestore";
 
 const OfficerSignup = () => {
   const [email, setEmail] = useState("");
+  const [nmls, setNMLS] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -58,6 +59,14 @@ const OfficerSignup = () => {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          name="nmls"
+          type="nmls"
+          placeholder="NMLS Number"
+          value={nmls}
+          onChange={(e) => setNMLS(e.target.value)}
           required
         />
         <input

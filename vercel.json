@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "http://texasmortgagelead.com/:path*",
+      "destination": "https://texasmortgagelead.com/:path*",
+      "permanent": true
+    }
+  ]
+}
