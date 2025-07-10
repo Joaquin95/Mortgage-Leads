@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Dashboard from "./components/Dashboard";
 import LeadForm from "./components/LeadForm";
@@ -9,21 +9,41 @@ import OfficerLogin from "./components/OfficerLogin";
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
 import "./App.css";
-import { AuthProvider } from "./services/useAuth";
+import { AuthProvider, useAuth } from "./services/useAuth";
+
+const ProtectedRoute = ({ children }) => {
+  const { currentUser } = useAuth();
+  return currentUser? children : <Navigate to="/login" />;
+};
+
+const AdminRoute = ({ children }) => {
+  const { currentUser } = useAuth();
+  return currentUser?.email === "Mintinvestments95@gmail.com" ? children : <Navigate to="/" />;
+};
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/leadform" element={<LeadForm />} />
+      <Route path="/login" element={<OfficerLogin />} />
+      <Route path="/signup" element={<OfficerSignup />} />  
+
+      {/* Protected Routes */}
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+    </Routes>
+  );
+}
+
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/leadform" element={<LeadForm />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/signup" element={<OfficerSignup />} />
-          <Route path="/login" element={<OfficerLogin />} />
-        </Routes>
+        <AppRoutes />
         <Footer />
       </Router>
     </AuthProvider>
