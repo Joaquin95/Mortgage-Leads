@@ -3,7 +3,7 @@ import { app } from "../services/firebase";
 import { useAuth } from "../services/useAuth";
 import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe("YOUR_PUBLIC_STRIPE_KEY");
+const stripePromise = loadStripe("pk_test_51RUFe3FmfJpxrjsao8Ke0fu4lLUSlH6EJkdrurlD1wU8DQpy1O7WRrBOpuZnQHcRp7D24oDDKCtaKSIyx6pmpIdL00Z0iuOBEG");
 
 const ChoosePlan = () => {
   const { currentUser } = useAuth();
@@ -30,7 +30,7 @@ const ChoosePlan = () => {
       alert("Something went wrong! Please try again.");
     }
   };
-  
+
   return (
     <div className="plan-options">
       <h3>Choose a Plan</h3>
