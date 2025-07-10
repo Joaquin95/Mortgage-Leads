@@ -19,12 +19,11 @@ exports.createCheckoutSession = onCall(
       throw new Error("Unauthenticated: User must be logged in.");
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
+    const stripe = new Stripe(req.rawRequest.env.STRIPE_SECRET_KEY);
     const priceMap = {
-      basic: process.env.PRICE_BASIC,
-      standard: process.env.PRICE_STANDARD,
-      premium: process.env.PRICE_PREMIUM,
+      basic: req.rawRequest.env.PRICE_BASIC,
+      standard: req.rawRequest.env.PRICE_STANDARD,
+      premium: req.rawRequest.env.PRICE_PREMIUM,
     };
 
     const priceId = priceMap[subscriptionType];
@@ -43,8 +42,8 @@ exports.createCheckoutSession = onCall(
           quantity: 1,
         },
       ],
-      success_url: "https://mortgage-leads.vercel.app/dashboard?success=true",
-      cancel_url: "https://mortgage-leads.vercel.app/dashboard?cancelled=true",
+      success_url: "https://texasmortgagelead.com/dashboard?success=true",
+      cancel_url: "https://texasmortgagelead.com/dashboard?cancelled=true",
       metadata: {
         firebaseUID: auth.uid,
       },

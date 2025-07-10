@@ -37,22 +37,22 @@ const ChoosePlan = () => {
       <p>Select a plan to start receiving Texas mortgage leads.</p>
 
       <button
-        onClick={() => handleSubscribe("starter")}
+        onClick={() => handleSubscribe("basic")}
         className="plan-button green"
       >
-        Starter (5 Leads)
+        Basic plan (5 Leads)
       </button>
       <button
-        onClick={() => handleSubscribe("pro")}
+        onClick={() => handleSubscribe("standard")}
         className="plan-button blue"
       >
-        Pro (10 Leads)
+        Standard plan (10 Leads)
       </button>
       <button
-        onClick={() => handleSubscribe("elite")}
+        onClick={() => handleSubscribe("premium")}
         className="plan-button purple"
       >
-        Elite (20 Leads)
+        Premium plan (20 Leads)
       </button>
     </div>
   );
