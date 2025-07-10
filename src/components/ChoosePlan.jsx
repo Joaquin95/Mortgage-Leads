@@ -1,24 +1,36 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { app } from "../services/firebase";
 import { useAuth } from "../services/useAuth";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe("YOUR_PUBLIC_STRIPE_KEY");
 
 const ChoosePlan = () => {
   const { currentUser } = useAuth();
 
-  const handleSubscribe = async (plan) => {
-    const functions = getFunctions(app);
-    const createCheckoutSession = httpsCallable(
-      functions,
-      "createCheckoutSession"
-    );
-    const result = await createCheckoutSession({
-      email: currentUser.email,
-      plan,
-    });
+  const handleSubscribe = async (subscriptionType) => {
+    try {
+      const functions = getFunctions(app);
+      const createCheckoutSession = httpsCallable(
+        functions,
+        "createCheckoutSession"
+      );
 
-    window.location.href = result.data.url; // Redirect to Stripe checkout
+      const result = await createCheckoutSession({
+        email: currentUser.email,
+        subscriptionType,
+      });
+
+      const sessionId = result.data.id;
+
+      const stripe = await stripePromise;
+      await stripe.redirectToCheckout({ sessionId });
+    } catch (err) {
+      console.error("Stripe checkout error:", err.message);
+      alert("Something went wrong! Please try again.");
+    }
   };
-
+  
   return (
     <div className="plan-options">
       <h3>Choose a Plan</h3>
@@ -47,4 +59,3 @@ const ChoosePlan = () => {
 };
 
 export default ChoosePlan;
-
