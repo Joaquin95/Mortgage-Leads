@@ -24,7 +24,7 @@ const ChoosePlan = () => {
       const sessionId = result.data.id;
 
       const stripe = await stripePromise;
-      await stripe.redirectToCheckout({ sessionId });
+      window.open(`https://checkout.stripe.com/pay/${sessionId}`, "_blank");
     } catch (err) {
       console.error("Stripe checkout error:", err.message);
       alert("Something went wrong! Please try again.");
