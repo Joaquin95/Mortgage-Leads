@@ -10,6 +10,10 @@ import Header from "./layout/Header";
 import Footer from "./layout/Footer";
 import "./App.css";
 import { AuthProvider, useAuth } from "./services/useAuth";
+import { setPersistence, browserLocalPersistence } from "firebase/auth";
+import { auth } from "./services/firebase";
+
+setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
