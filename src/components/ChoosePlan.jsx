@@ -26,15 +26,9 @@ const ChoosePlan = () => {
       const sessionId = result.data.id;
       const stripe = await stripePromise;
 
-      // Open new tab early to avoid popup blockers
-      const checkoutWindow = window.open("", "_blank");
+      if (!stripe) throw new Error("Stripe failed to load");
 
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-
-      if (error) {
-        console.error("Stripe checkout error:", error.message);
-        checkoutWindow.close(); // close the tab if redirect fails
-      }
+      await stripe.redirectToCheckout({ sessionId });
     } catch (err) {
       console.error("Stripe checkout error:", err.message);
       alert("Something went wrong! Please try again.");
