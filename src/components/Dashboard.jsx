@@ -72,7 +72,9 @@ const Dashboard = () => {
       ) : (
         <div className="subscription-card">
           <h3>Subscription Status</h3>
-          <p>📦 Plan: <strong>{subscription}</strong></p>
+          <p>
+            📦 Plan: <strong>{subscription}</strong>
+          </p>
           <p>📈 Leads used this month: {leadsUsed}</p>
           <button className="upgrade-btn">Upgrade Plan</button>
         </div>

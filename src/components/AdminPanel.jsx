@@ -38,7 +38,7 @@ const AdminPanel = () => {
   if (!currentUser || currentUser.email !== "mintinvestments95@gmail.com") {
     return <p className="text-white p-4">❌ Access Denied</p>;
   }
-  
+
   return (
     <div className="why-leads min-h-screen p-8">
       <h1 className="text-3xl font-bold text-white mb-6">Admin Panel</h1>
