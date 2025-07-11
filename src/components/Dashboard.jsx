@@ -15,40 +15,34 @@ const Dashboard = () => {
   const [leadsUsed, setLeadsUsed] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Apply persistence only once at app start
   useEffect(() => {
-    setPersistence(auth, browserLocalPersistence).catch((err) =>
-      console.error("Persistence error:", err)
-    );
-  }, []);
+    // Set auth persistence globally
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-  // Detect auth and set real-time subscription info
-  useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
 
-        // Show admin panel
-        if (
-          firebaseUser.email &&
-          firebaseUser.email.toLowerCase() === "mintinvestments95@gmail.com"
-        ) {
+        // If admin, skip Firestore fetch
+        if (firebaseUser.email.toLowerCase() === "mintinvestments95@gmail.com") {
           setLoading(false);
           return;
         }
 
-        // Listen for changes in Firestore
         const docRef = doc(db, "loanOfficers", firebaseUser.uid);
-        const unsubscribeSnap = onSnapshot(docRef, (docSnap) => {
+
+        const unsubDoc = onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data();
             setSubscription(data.subscription);
             setLeadsUsed(data.leadsSentThisMonth || 0);
+          } else {
+            console.warn("Loan officer doc not found.");
           }
           setLoading(false);
         });
 
-        return () => unsubscribeSnap();
+        return () => unsubDoc();
       } else {
         setUser(null);
         setLoading(false);
@@ -58,32 +52,24 @@ const Dashboard = () => {
     return () => unsubscribeAuth();
   }, []);
 
-  // Refresh after Stripe success to reload updated subscription
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("success")) {
-      setTimeout(() => {
-        window.location.href = "/dashboard"; // remove ?success from URL
-      }, 1000);
-    }
-  }, []);
+  if (loading) return <p>Loading your dashboard...</p>;
+  if (!user) return <p>Please log in to view your dashboard.</p>;
 
-  if (loading) return <p>Loading...</p>;
-  if (!user) return <p>Please log in.</p>;
-
+  // Admin view
   if (user.email.toLowerCase() === "mintinvestments95@gmail.com") {
     return <AdminPanel />;
   }
 
+  // Officer view
   return (
     <div className="dashboard-container">
       <h2>Welcome to Your Dashboard</h2>
-      {subscription === null ? (
+      {subscription === null || subscription === undefined ? (
         <ChoosePlan user={user} />
       ) : (
         <div className="subscription-card">
           <h3>Subscription Status</h3>
-          <p>📦 Plan: <strong>{subscription}</strong></p>
+          <p>📦 Plan: <strong>{subscription} Leads/month</strong></p>
           <p>📈 Leads used this month: {leadsUsed}</p>
           <button className="upgrade-btn">Upgrade Plan</button>
         </div>
