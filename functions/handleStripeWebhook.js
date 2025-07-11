@@ -1,35 +1,38 @@
-const { onRequest } = require("firebase-functions/v2/https");
+const functions = require("firebase-functions");
 const admin = require("./initAdmin");
 const Stripe = require("stripe");
 
+const stripe = new Stripe(functions.config().stripe.secret_key);
+const endpointSecret = functions.config().stripe.webhook_secret;
 
-exports.handleStripeWebhook = onRequest(
-  { secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"] },
+exports.handleStripeWebhook = functions.https.onRequest(
+  {
+    timeoutSeconds: 30,
+    cors: false,
+    // Required: Disables automatic body parsing so rawBody is available
+    rawBody: true,
+  },
   async (req, res) => {
-   
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
     const sig = req.headers["stripe-signature"];
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const endpointSecret = functions.config().stripe.webhook_secret;
 
     let event;
-
     try {
       event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
     } catch (err) {
-      console.error("Webhook signature error:", err.message);
+      console.error("❌ Webhook signature error:", err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
-
       const uid = session.metadata.firebaseUID;
       const customerEmail = session.customer_email;
 
       let subscriptionAmount = 5;
-      if (session.amount_total === 1000) subscriptionAmount = 10;
-      else if (session.amount_total === 2000) subscriptionAmount = 20;
+      if (session.amount_total === 2999) subscriptionAmount = 10;
+      else if (session.amount_total === 4999) subscriptionAmount = 20;
+      else if (session.amount_total === 1999) subscriptionAmount = 5;
 
       try {
         await admin.firestore().collection("loanOfficers").doc(uid).set(
@@ -43,13 +46,13 @@ exports.handleStripeWebhook = onRequest(
         );
 
         console.log("✅ Subscription updated for:", customerEmail);
-        res.json({ received: true });
+        return res.json({ received: true });
       } catch (err) {
-        console.error("Firestore update error:", err);
-        res.status(500).send("Internal Server Error");
+        console.error("❌ Firestore update error:", err);
+        return res.status(500).send("Internal Server Error");
       }
-    } else {
-      res.json({ received: true });
     }
+
+    return res.json({ received: true });
   }
 );
