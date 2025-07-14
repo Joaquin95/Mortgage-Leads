@@ -1,63 +1,46 @@
-const { onCall } = require("firebase-functions/v2/https");
+const functions = require("firebase-functions");
 const admin = require("./initAdmin");
 const Stripe = require("stripe");
-const { defineSecret } = require("firebase-functions/params");
 
-const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
-const PRICE_BASIC = defineSecret("PRICE_BASIC");
-const PRICE_STANDARD = defineSecret("PRICE_STANDARD");
-const PRICE_PREMIUM = defineSecret("PRICE_PREMIUM");
+const stripe = new Stripe(functions.config().stripe.secret_key);
 
-exports.createCheckoutSession = onCall(
-  {
-    secrets: [STRIPE_SECRET_KEY, PRICE_BASIC, PRICE_STANDARD, PRICE_PREMIUM],
-  },
-  async (req) => {
-    const { email, subscriptionType } = req.data;
-    const auth = req.auth;
-
-    console.log("Incoming data:", req.data);
-    console.log("Auth:", auth);
+exports.createCheckoutSession = functions
+  .runWith({ timeoutSeconds: 60 }) 
+  .https.onCall(async (data, context) => {
+    const { email, subscriptionType } = data;
+    const auth = context.auth;
 
     if (!auth) {
-      throw new Error("Unauthenticated: User must be logged in.");
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "User must be logged in."
+      );
     }
 
-    const stripe = new Stripe(STRIPE_SECRET_KEY.value());
     const priceMap = {
-      basic: PRICE_BASIC.value(),
-      standard: PRICE_STANDARD.value(),
-      premium: PRICE_PREMIUM.value(),
+      basic: functions.config().stripe.price_basic,
+      standard: functions.config().stripe.price_standard,
+      premium: functions.config().stripe.price_premium,
     };
 
     const priceId = priceMap[subscriptionType];
 
-    console.log("Subscription Type:", subscriptionType);
-    console.log("Resolved Price ID:", priceId);
-
     if (!priceId) {
-      throw new Error("Invalid subscription type.");
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Invalid subscription type."
+      );
     }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "subscription",
       customer_email: email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: "https://texasmortgagelead.com/dashboard?success=true",
       cancel_url: "https://texasmortgagelead.com/dashboard?cancelled=true",
-      metadata: {
-        firebaseUID: auth.uid,
-      },
+      metadata: { firebaseUID: auth.uid },
     });
 
-    return {
-      id: session.id,
-    };
-  }
-);
+    return { id: session.id };
+  });
