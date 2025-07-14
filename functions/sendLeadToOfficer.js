@@ -10,6 +10,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
       name,
       email,
       phone,
+      city,
       loanType,
       zip,
       creditScore,
@@ -53,6 +54,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
 <p><strong>Name:</strong> ${name}</p>
 <p><strong>Email:</strong> ${email}</p>
 <p><strong>Phone:</strong> ${phone}</p>
+<p><strong>City:</strong> ${city}</p>     
 <p><strong>Loan Type:</strong> ${loanType}</p>
 <p><strong>Loan Amount:</strong> ${loanAmount}</p>
 <p><strong>ZIP:</strong> ${zip}</p>
@@ -71,6 +73,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
         name,
         email,
         phone,
+        city,  
         loanType,
         zip,
         creditScore,

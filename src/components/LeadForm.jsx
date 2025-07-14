@@ -21,8 +21,8 @@ const LeadForm = () => {
   const [loading, setLoading] = useState(false);
 
   const texasZipRanges = [
-    [75001, 79999], // Main TX ZIP block
-    [88500, 88599], // El Paso block
+    [75001, 79999],
+    [88500, 88599], 
   ];
 
   const isTexasZip = (zip) => {
@@ -78,7 +78,7 @@ const LeadForm = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
         <p className="text-green-700 text-xl font-semibold text-center">
-          ✅ Thank you! A top Texas Loan Officer will reach out to you soon.
+          ✅ Thank you! One of our top Loan Officer's will reach out to you soon.
         </p>
       </div>
     );

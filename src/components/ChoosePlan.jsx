@@ -1,3 +1,6 @@
+// src/components/ChoosePlan.jsx
+
+import React from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { app } from "../services/firebase";
 import { useAuth } from "../services/useAuth";
@@ -9,55 +12,67 @@ const stripePromise = loadStripe(
 
 const ChoosePlan = () => {
   const { currentUser } = useAuth();
+  const functions = getFunctions(app, "us-central1");
+  const createCheckoutSession = httpsCallable(
+    functions,
+    "createCheckoutSession"
+  );
 
   const handleSubscribe = async (subscriptionType) => {
-    try {
-      const functions = getFunctions(app);
-      const createCheckoutSession = httpsCallable(
-        functions,
-        "createCheckoutSession"
-      );
+    if (!currentUser) {
+      alert("Please log in to subscribe.");
+      return;
+    }
 
-      const result = await createCheckoutSession({
+    try {
+      const { data } = await createCheckoutSession({
         email: currentUser.email,
-        subscriptionType,
+        subscriptionType, // "basic" | "standard" | "premium"
       });
 
-      const sessionId = result.data.id;
+      const sessionId = data.id;
       const stripe = await stripePromise;
+      if (!stripe) throw new Error("Stripe.js failed to load.");
 
-      if (!stripe) throw new Error("Stripe failed to load");
-
-      await stripe.redirectToCheckout({ sessionId });
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+      if (error) {
+        console.error("Stripe redirect error:", error);
+        alert(error.message);
+      }
     } catch (err) {
-      console.error("Stripe checkout error:", err.message);
-      alert("Something went wrong! Please try again.");
+      console.error("Subscription error:", err);
+      alert(err.message || "Failed to start checkout. Please try again.");
     }
   };
 
   return (
-    <div className="plan-options">
-      <h3>Choose a Plan</h3>
-      <p>Select a plan to start receiving Texas mortgage leads.</p>
+    <div className="plan-options p-6 bg-slate-700 rounded-lg shadow-lg text-white">
+      <h3 className="text-2xl font-semibold mb-4">Choose Your Plan</h3>
+      <p className="mb-6">
+        Select a plan below to start receiving high-intent Texas mortgage
+        leads.
+      </p>
 
-      <button
-        onClick={() => handleSubscribe("basic")}
-        className="plan-button green"
-      >
-        Basic plan (5 Leads)
-      </button>
-      <button
-        onClick={() => handleSubscribe("standard")}
-        className="plan-button blue"
-      >
-        Standard plan (10 Leads)
-      </button>
-      <button
-        onClick={() => handleSubscribe("premium")}
-        className="plan-button purple"
-      >
-        Premium plan (20 Leads)
-      </button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button
+          onClick={() => handleSubscribe("basic")}
+          className="plan-button green px-4 py-3 rounded-lg"
+        >
+          Basic Plan (5 Leads)
+        </button>
+        <button
+          onClick={() => handleSubscribe("standard")}
+          className="plan-button blue px-4 py-3 rounded-lg"
+        >
+          Standard Plan (10 Leads)
+        </button>
+        <button
+          onClick={() => handleSubscribe("premium")}
+          className="plan-button purple px-4 py-3 rounded-lg"
+        >
+          Premium Plan (20 Leads)
+        </button>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+// src/components/Dashboard.jsx
+
+import React, { useState, useEffect, useCallback } from "react";
 import { auth, db } from "../services/firebase";
 import {
   doc,
@@ -16,16 +18,14 @@ import {
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence,
+  signOut,
 } from "firebase/auth";
+
 import ChoosePlan from "./ChoosePlan";
 import AdminPanel from "./AdminPanel";
-import { signOut } from "firebase/auth";
 
-const quota = {
-  Basic: 5,
-  Standard: 10,
-  Premium: 20,
-};
+const ADMIN_EMAIL = "mintinvestments95@gmail.com";
+const QUOTA = { Basic: 5, Standard: 10, Premium: 20 };
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -38,85 +38,92 @@ const Dashboard = () => {
   const [notesStatus, setNotesStatus] = useState({});
   const [pageSize] = useState(10);
 
+  // Compute progress bar values
   const getProgress = () => {
-    const max = quota[subscriptionType] || 0;
+    const max = QUOTA[subscriptionType] || 0;
     const percent = Math.min((leadsUsed / max) * 100, 100);
     return { max, percent };
   };
 
-  const fetchLeads = async (reset = false) => {
-    if (!user?.email) return;
+  // Stable fetchLeads function
+  const fetchLeads = useCallback(
+    async (reset = false) => {
+      if (!user?.email) return;
 
-    let baseQuery = query(
-      collection(db, "leads"),
-      where("officerEmail", "==", user.email)
-    );
+      // Build query
+      let base = query(
+        collection(db, "leads"),
+        where("officerEmail", "==", user.email)
+      );
+      if (filterStatus !== "All") {
+        base = query(base, where("status", "==", filterStatus));
+      }
 
-    if (filterStatus !== "All") {
-      baseQuery = query(baseQuery, where("status", "==", filterStatus));
-    }
+      let paged = query(base, orderBy("timestamp", "desc"), limit(pageSize));
+      if (!reset && lastDoc) {
+        paged = query(paged, startAfter(lastDoc));
+      }
 
-    let finalQuery = query(
-      baseQuery,
-      orderBy("timestamp", "desc"),
-      limit(pageSize)
-    );
+      // Fetch and update state
+      const snap = await getDocs(paged);
+      const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setLeads((prev) => (reset ? docs : [...prev, ...docs]));
+      setLastDoc(snap.docs[snap.docs.length - 1]);
+    },
+    [user, filterStatus, lastDoc, pageSize]
+  );
 
-    if (!reset && lastDoc) {
-      finalQuery = query(finalQuery, startAfter(lastDoc));
-    }
-
-    const snap = await getDocs(finalQuery);
-    const docs = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setLeads(reset ? docs : [...leads, ...docs]);
-    setLastDoc(snap.docs[snap.docs.length - 1]);
-  };
-
+  // Auth & data listener
   useEffect(() => {
-    // 1-Hour Persistent Auth
     setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-
-        if (
-          firebaseUser.email.toLowerCase() === "mintinvestments95@gmail.com"
-        ) {
-          setLoading(false);
-          return;
-        }
-
-        const officerRef = doc(db, "loanOfficers", firebaseUser.uid);
-        const unsubDoc = onSnapshot(officerRef, (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            setSubscriptionType(data.subscriptionType);
-            setLeadsUsed(data.leadsSentThisMonth || 0);
-          }
-        });
-
-        await fetchLeads(true);
-        setLoading(false);
-
-        return () => unsubDoc();
-      } else {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
+      if (!fbUser) {
         setUser(null);
         setLoading(false);
+        return;
       }
+
+      setUser(fbUser);
+      // If admin, skip fetching leads
+      if (fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        setLoading(false);
+        return;
+      }
+
+      // Listen to loanOfficer doc changes
+      const officerRef = doc(db, "loanOfficers", fbUser.uid);
+      const unsubDoc = onSnapshot(officerRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          setSubscriptionType(data.subscription);
+          setLeadsUsed(data.leadsSentThisMonth || 0);
+        }
+      });
+
+      // Initial leads fetch
+      await fetchLeads(true);
+      setLoading(false);
+
+      return () => unsubDoc();
     });
 
     return () => unsubscribeAuth();
-  }, [filterStatus]);
+  }, [fetchLeads, filterStatus]);
 
-  if (loading) return <p className="text-white p-4">⏳ Loading dashboard...</p>;
-  if (!user)
+  // Loading / auth guard
+  if (loading) {
+    return <p className="text-white p-4">⏳ Loading dashboard...</p>;
+  }
+  if (!user) {
     return <p className="text-white p-4">❌ Please log in to continue.</p>;
-
-  if (user.email.toLowerCase() === "mintinvestments95@gmail.com") {
+  }
+  // Admin view
+  if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     return <AdminPanel />;
   }
 
+  // User view
   const { max, percent } = getProgress();
 
   return (
@@ -140,7 +147,7 @@ const Dashboard = () => {
           </div>
         </div>
       ) : (
-        <ChoosePlan user={user} />
+        <ChoosePlan />
       )}
 
       <div className="mb-4">
@@ -161,59 +168,47 @@ const Dashboard = () => {
         </select>
       </div>
 
-      <button
-        onClick={() => {
-          window.open("https://YOUR_STRIPE_PORTAL_URL", "_blank");
-        }}
-        className="mt-2 mb-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-      >
-        Manage Subscription
-      </button>
-
-      <button onClick={() => signOut(auth)} className="signout-btn">
-        Sign Out
-      </button>
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => window.open("https://YOUR_STRIPE_PORTAL_URL", "_blank")}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+        >
+          Manage Subscription
+        </button>
+        <button
+          onClick={() => signOut(auth)}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+        >
+          Sign Out
+        </button>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         {leads.map((lead) => (
-          <div key={lead.id} className="lead-card">
-            <p>
-              <strong>Name:</strong> {lead.name}
-            </p>
-            <p>
-              <strong>Email:</strong> {lead.email}
-            </p>
-            <p>
-              <strong>Phone:</strong> {lead.phone}
-            </p>
-            <p>
-              <strong>Loan Type:</strong> {lead.loanType}
-            </p>
-            <p>
-              <strong>Loan Amount:</strong> ${lead.loanAmount}
-            </p>
-            <p>
-              <strong>ZIP:</strong> {lead.zip}
-            </p>
-            <p>
-              <strong>Credit Score:</strong> {lead.creditScore}
-            </p>
-            <p>
-              <strong>Occupancy:</strong> {lead.occupancy}
-            </p>
+          <div key={lead.id} className="lead-card p-4 bg-slate-700 rounded-lg">
+            <p><strong>Name:</strong> {lead.name}</p>
+            <p><strong>Email:</strong> {lead.email}</p>
+            <p><strong>Phone:</strong> {lead.phone}</p>
+            <p><strong>City:</strong> {lead.city || "—"}</p>
+            <p><strong>ZIP:</strong> {lead.zip}</p>
+            <p><strong>Loan Type:</strong> {lead.loanType}</p>
+            <p><strong>Loan Amount:</strong> ${lead.loanAmount}</p>
+            <p><strong>Credit Score:</strong> {lead.creditScore}</p>
+            <p><strong>Property Type:</strong> {lead.propertyType}</p>
+            <p><strong>Occupancy:</strong> {lead.occupancy}</p>
+            <p><strong>Home Buyer Type:</strong> {lead.homeBuyerType}</p>
             <p>
               <strong>Submitted:</strong>{" "}
               {lead.timestamp?.toDate().toLocaleString()}
             </p>
 
-            <label className="mt-2 block">Status:</label>
+            <label className="mt-4 block text-white font-medium">Status:</label>
             <select
-              className="text-black p-2 rounded mt-1"
+              className="text-black p-2 rounded mt-1 w-full"
               value={lead.status || "New"}
               onChange={async (e) => {
-                const newStatus = e.target.value;
                 await updateDoc(doc(db, "leads", lead.id), {
-                  status: newStatus,
+                  status: e.target.value,
                 });
               }}
             >
@@ -224,23 +219,19 @@ const Dashboard = () => {
 
             <p className="mt-4 font-semibold">Notes:</p>
             <textarea
-              className="notes-area"
+              className="notes-area w-full p-2 rounded bg-slate-800 text-white"
               value={lead.notes || ""}
               placeholder="Add notes or CRM comments"
               rows={3}
               onChange={async (e) => {
-                const value = e.target.value;
-                setNotesStatus((prev) => ({ ...prev, [lead.id]: "saving" }));
-
-                await updateDoc(doc(db, "leads", lead.id), {
-                  notes: value,
-                });
-
-                setNotesStatus((prev) => ({ ...prev, [lead.id]: "saved" }));
-
-                setTimeout(() => {
-                  setNotesStatus((prev) => ({ ...prev, [lead.id]: "" }));
-                }, 2000);
+                const text = e.target.value;
+                setNotesStatus((s) => ({ ...s, [lead.id]: "saving" }));
+                await updateDoc(doc(db, "leads", lead.id), { notes: text });
+                setNotesStatus((s) => ({ ...s, [lead.id]: "saved" }));
+                setTimeout(
+                  () => setNotesStatus((s) => ({ ...s, [lead.id]: "" })),
+                  2000
+                );
               }}
             />
             {notesStatus[lead.id] === "saving" && (

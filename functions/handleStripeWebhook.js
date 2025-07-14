@@ -26,12 +26,10 @@ exports.handleStripeWebhook = functions
       let subscriptionType = "unknown";
 
       try {
-        // Retrieve line items to get the price ID
         const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
         const item = lineItems?.data?.[0];
         const priceId = item?.price?.id;
 
-        // Map Stripe price IDs to plan labels
         const priceMap = {
           [functions.config().stripe.price_basic]: "Basic",
           [functions.config().stripe.price_standard]: "Standard",
