@@ -36,7 +36,7 @@ const AdminPanel = () => {
   };
 
   if (!currentUser || currentUser.email !== "mintinvestments95@gmail.com") {
-    return <p className="text-white p-4">❌ Access Denied</p>;
+    return <p className="text-red-500 p-4">❌ Access Denied</p>;
   }
 
   return (

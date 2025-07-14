@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../services/firebase";
 import { doc, setDoc } from "firebase/firestore";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const OfficerSignup = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +14,10 @@ const OfficerSignup = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    AOS.init({ duration: 800 });
+  }, []);
 
   const isPasswordStrong = (password) => {
     const regex =
@@ -80,7 +86,7 @@ const OfficerSignup = () => {
           />
           <input
             name="nmls"
-            type="nmls"
+            type="text"
             placeholder="NMLS Number"
             value={nmls}
             onChange={(e) => setNMLS(e.target.value)}
