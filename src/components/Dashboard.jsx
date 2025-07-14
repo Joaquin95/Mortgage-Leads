@@ -169,16 +169,14 @@ const Dashboard = () => {
       >
         Manage Subscription
       </button>
-      <button
-        onClick={() => signOut(auth)}
-        className="mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded"
-      >
+
+      <button onClick={() => signOut(auth)} className="signout-btn">
         Sign Out
       </button>
 
       <div className="grid gap-4 md:grid-cols-2">
         {leads.map((lead) => (
-          <div key={lead.id} className="bg-slate-700 p-4 rounded-lg shadow-sm">
+          <div key={lead.id} className="lead-card">
             <p>
               <strong>Name:</strong> {lead.name}
             </p>
@@ -226,7 +224,7 @@ const Dashboard = () => {
 
             <p className="mt-4 font-semibold">Notes:</p>
             <textarea
-              className="w-full p-2 mt-1 bg-white text-black rounded resize-none"
+              className="notes-area"
               value={lead.notes || ""}
               placeholder="Add notes or CRM comments"
               rows={3}

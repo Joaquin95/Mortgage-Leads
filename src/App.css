@@ -272,3 +272,54 @@ main {
   color: #ebebeb;
   text-decoration: none;
 }
+.signout-btn {
+  background-color: #dc2626; /* red-600 */
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.signout-btn:hover {
+  background-color: #b91c1c; /* red-700 */
+}
+.toast {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #16a34a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: fadein 0.3s ease;
+}
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+  color: #94a3b8; /* slate-400 */
+}
+.card-heading {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #e2e8f0; /* slate-100 */
+  border-bottom: 1px solid #475569;
+  padding-bottom: 6px;
+}
+
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
