@@ -1,24 +1,13 @@
 import React, { useState } from "react";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  query,
-  getDocs,
-  updateDoc,
-  doc,
-  limit,
-} from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
-import { db, functions } from "../services/firebase";
+import { httpsCallable, getFunctions } from "firebase/functions";
+import { app } from "../services/firebase";
 
-const Leadform = () => {
+const LeadForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     city: "",
-    state: "",
     zip: "",
     loanType: "",
     loanAmount: "",
@@ -31,81 +20,54 @@ const Leadform = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const texasZipRanges = [
+    [75001, 79999], // Main TX ZIP block
+    [88500, 88599], // El Paso block
+  ];
+
+  const isTexasZip = (zip) => {
+    const parsed = parseInt(zip, 10);
+    return texasZipRanges.some(([min, max]) => parsed >= min && parsed <= max);
+  };
+
+  const formatPhone = (value) => {
+    const digits = value.replace(/\D/g, "");
+    const length = digits.length;
+    if (length < 4) return digits;
+    if (length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(
+      6,
+      10
+    )}`;
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "phone") {
+      setFormData({ ...formData, [name]: formatPhone(value) });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    if (!isTexasZip(formData.zip)) {
+      alert("❌ Please enter a valid Texas ZIP code.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const q = query(collection(db, "loanOfficers"), limit(200));
-      const snapshot = await getDocs(q);
-
-      const officers = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      const eligible = officers.filter(
-        (o) => o.leadsSentThisMonth < o.subscription
-      );
-
-      eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth);
-
-      let chosen;
-
-      if (eligible.length > 0) {
-        chosen = eligible[0];
-
-        await updateDoc(doc(db, "loanOfficers", chosen.id), {
-          leadsSentThisMonth: chosen.leadsSentThisMonth + 1,
-          lastLeadSent: serverTimestamp(),
-        });
-
-        console.log("Chosen officer:", chosen.email);
-      } else {
-        chosen = {
-          email:
-            process.env.REACT_APP_FALLBACK_OFFICER_EMAIL ||
-            "Mintinvestments95@gmail.com",
-          name:
-            process.env.REACT_APP_FALLBACK_OFFICER_NAME || "Fallback Officer",
-        };
-
-        console.log("No eligible officers. Fallback to:", chosen.email);
-      }
-
-      // ✅ Call the Cloud Function using httpsCallable
-      const sendLeadEmail = httpsCallable(functions, "sendLeadEmail");
-
-      await sendLeadEmail({
-        officerEmail: chosen.email,
-        officerName: chosen.name,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        loanType: formData.loanType,
-        zip: formData.zip,
-        city: formData.city,
-        state: formData.state,
-        creditScore: formData.creditScore,
-        loanAmount: formData.loanAmount,
-        propertyType: formData.propertyType,
-        occupancy: formData.occupancy,
-        homeBuyerType: formData.homeBuyerType,
-      });
-
-      await addDoc(collection(db, "leads"), {
-        ...formData,
-        assignedTo: chosen.email,
-        createdAt: serverTimestamp(),
-      });
-
+      const functions = getFunctions(app);
+      const sendLeadToOfficer = httpsCallable(functions, "sendLeadToOfficer");
+      await sendLeadToOfficer(formData);
       setSubmitted(true);
     } catch (err) {
-      console.error("Submission error:", err.message || err);
+      console.error("Submission error:", err.message);
       alert("❌ Something went wrong. Please try again later.");
     } finally {
       setLoading(false);
@@ -116,25 +78,26 @@ const Leadform = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
         <p className="text-green-700 text-xl font-semibold text-center">
-          ✅ Thank you! We'll contact you soon.
+          ✅ Thank you! A top Texas Loan Officer will reach out to you soon.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="lead-form">
-      <h2 className="form-heading">
-        🏡 Request a Free Mortgage Quote from our top Loan Officers
+    <form onSubmit={handleSubmit} className="lead-form p-6 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4 text-center text-slate-800">
+        🏡 Request a Free Mortgage Quote from Texas Loan Officers
       </h2>
 
-      <div className="form-grid">
+      <div className="form-grid grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
         <input
           name="name"
           placeholder="Full Name"
           value={formData.name}
           onChange={handleChange}
           required
+          className="p-3 rounded bg-white text-black"
         />
         <input
           name="email"
@@ -143,6 +106,7 @@ const Leadform = () => {
           value={formData.email}
           onChange={handleChange}
           required
+          className="p-3 rounded bg-white text-black"
         />
         <input
           name="phone"
@@ -150,19 +114,8 @@ const Leadform = () => {
           value={formData.phone}
           onChange={handleChange}
           required
-        />
-        <input
-          name="zip"
-          placeholder="Property ZIP Code"
-          value={formData.zip}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="creditScore"
-          placeholder="Estimated Credit Score"
-          value={formData.creditScore}
-          onChange={handleChange}
+          className="p-3 rounded bg-white text-black"
+          maxLength={14}
         />
         <input
           name="loanAmount"
@@ -170,6 +123,29 @@ const Leadform = () => {
           value={formData.loanAmount}
           onChange={handleChange}
           required
+          className="p-3 rounded bg-white text-black"
+        />
+        <input
+          name="zip"
+          placeholder="Texas ZIP Code"
+          value={formData.zip}
+          onChange={handleChange}
+          required
+          className="p-3 rounded bg-white text-black"
+        />
+        <input
+          name="creditScore"
+          placeholder="Estimated Credit Score"
+          value={formData.creditScore}
+          onChange={handleChange}
+          className="p-3 rounded bg-white text-black"
+        />
+        <input
+          name="city"
+          placeholder="City"
+          value={formData.city}
+          onChange={handleChange}
+          className="p-3 rounded bg-white text-black"
         />
 
         <select
@@ -177,6 +153,7 @@ const Leadform = () => {
           value={formData.loanType}
           onChange={handleChange}
           required
+          className="p-3 rounded bg-white text-black"
         >
           <option value="">Select Loan Type</option>
           <option>Purchase</option>
@@ -184,7 +161,7 @@ const Leadform = () => {
           <option>FHA</option>
           <option>VA</option>
           <option>Home Equity</option>
-          <option>Home improvement</option>
+          <option>Home Improvement</option>
         </select>
 
         <select
@@ -192,14 +169,14 @@ const Leadform = () => {
           value={formData.propertyType}
           onChange={handleChange}
           required
+          className="p-3 rounded bg-white text-black"
         >
           <option value="">Property Type</option>
           <option>Single Family</option>
           <option>Multi Family</option>
-          <option>FHA</option>
-          <option>VA</option>
           <option>Condo</option>
           <option>Manufactured or Mobile</option>
+          <option>Townhome</option>
         </select>
 
         <select
@@ -207,10 +184,11 @@ const Leadform = () => {
           value={formData.occupancy}
           onChange={handleChange}
           required
+          className="p-3 rounded bg-white text-black"
         >
           <option value="">Occupancy</option>
-          <option>Primary Home</option>
-          <option>Secondary Home</option>
+          <option>Primary Residence</option>
+          <option>Secondary Residence</option>
           <option>Investment Property</option>
         </select>
 
@@ -219,6 +197,7 @@ const Leadform = () => {
           value={formData.homeBuyerType}
           onChange={handleChange}
           required
+          className="p-3 rounded bg-white text-black"
         >
           <option value="">First-time Homebuyer?</option>
           <option>Yes</option>
@@ -233,4 +212,4 @@ const Leadform = () => {
   );
 };
 
-export default Leadform;
+export default LeadForm;
