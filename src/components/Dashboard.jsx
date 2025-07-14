@@ -38,19 +38,16 @@ const Dashboard = () => {
   const [notesStatus, setNotesStatus] = useState({});
   const [pageSize] = useState(10);
 
-  // Compute progress bar values
   const getProgress = () => {
     const max = QUOTA[subscriptionType] || 0;
     const percent = Math.min((leadsUsed / max) * 100, 100);
     return { max, percent };
   };
 
-  // Stable fetchLeads function
   const fetchLeads = useCallback(
     async (reset = false) => {
       if (!user?.email) return;
 
-      // Build query
       let base = query(
         collection(db, "leads"),
         where("officerEmail", "==", user.email)
@@ -64,7 +61,6 @@ const Dashboard = () => {
         paged = query(paged, startAfter(lastDoc));
       }
 
-      // Fetch and update state
       const snap = await getDocs(paged);
       const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setLeads((prev) => (reset ? docs : [...prev, ...docs]));
@@ -73,7 +69,6 @@ const Dashboard = () => {
     [user, filterStatus, lastDoc, pageSize]
   );
 
-  // Auth & data listener
   useEffect(() => {
     setPersistence(auth, browserLocalPersistence).catch(console.error);
 
@@ -85,13 +80,11 @@ const Dashboard = () => {
       }
 
       setUser(fbUser);
-      // If admin, skip fetching leads
       if (fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
         setLoading(false);
         return;
       }
 
-      // Listen to loanOfficer doc changes
       const officerRef = doc(db, "loanOfficers", fbUser.uid);
       const unsubDoc = onSnapshot(officerRef, (snap) => {
         if (snap.exists()) {
@@ -101,7 +94,6 @@ const Dashboard = () => {
         }
       });
 
-      // Initial leads fetch
       await fetchLeads(true);
       setLoading(false);
 
@@ -111,37 +103,34 @@ const Dashboard = () => {
     return () => unsubscribeAuth();
   }, [fetchLeads, filterStatus]);
 
-  // Loading / auth guard
   if (loading) {
     return <p className="text-white p-4">⏳ Loading dashboard...</p>;
   }
   if (!user) {
     return <p className="text-white p-4">❌ Please log in to continue.</p>;
   }
-  // Admin view
   if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     return <AdminPanel />;
   }
 
-  // User view
   const { max, percent } = getProgress();
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-slate-800 to-slate-900 text-white">
-      <h2 className="text-2xl font-bold mb-6">📋 Loan Officer Dashboard</h2>
+    <div className="dashboard-container">
+      <h2 className="dashboard-header">📋 Loan Officer Dashboard</h2>
 
       {subscriptionType ? (
-        <div className="bg-slate-700 p-4 rounded-lg shadow-md mb-6">
-          <h3 className="text-xl font-semibold mb-2">Your Subscription</h3>
+        <div className="subscription-card">
+          <h3>Your Subscription</h3>
           <p>
             📦 Plan: <strong>{subscriptionType}</strong> ({max} leads/month)
           </p>
           <p>
             📈 Leads Used: <strong>{leadsUsed}</strong> / {max}
           </p>
-          <div className="w-full bg-gray-600 h-4 rounded mt-2">
+          <div className="progress-bar-container">
             <div
-              className="bg-green-500 h-4 rounded"
+              className="progress-bar"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -150,10 +139,9 @@ const Dashboard = () => {
         <ChoosePlan />
       )}
 
-      <div className="mb-4">
-        <label className="mr-2 text-white">Filter by Status:</label>
+      <div className="filter-container">
+        <label>Filter by Status:</label>
         <select
-          className="text-black p-2 rounded"
           value={filterStatus}
           onChange={(e) => {
             setFilterStatus(e.target.value);
@@ -168,24 +156,9 @@ const Dashboard = () => {
         </select>
       </div>
 
-      <div className="flex gap-4 mb-6">
-        <button
-          onClick={() => window.open("https://YOUR_STRIPE_PORTAL_URL", "_blank")}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-        >
-          Manage Subscription
-        </button>
-        <button
-          onClick={() => signOut(auth)}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-        >
-          Sign Out
-        </button>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="lead-grid">
         {leads.map((lead) => (
-          <div key={lead.id} className="lead-card p-4 bg-slate-700 rounded-lg">
+          <div key={lead.id} className="lead-card">
             <p><strong>Name:</strong> {lead.name}</p>
             <p><strong>Email:</strong> {lead.email}</p>
             <p><strong>Phone:</strong> {lead.phone}</p>
@@ -202,9 +175,9 @@ const Dashboard = () => {
               {lead.timestamp?.toDate().toLocaleString()}
             </p>
 
-            <label className="mt-4 block text-white font-medium">Status:</label>
+            <label>Status:</label>
             <select
-              className="text-black p-2 rounded mt-1 w-full"
+              className="status-select"
               value={lead.status || "New"}
               onChange={async (e) => {
                 await updateDoc(doc(db, "leads", lead.id), {
@@ -217,9 +190,9 @@ const Dashboard = () => {
               <option value="Closed">Closed</option>
             </select>
 
-            <p className="mt-4 font-semibold">Notes:</p>
+            <p className="mt-4"><strong>Notes:</strong></p>
             <textarea
-              className="notes-area w-full p-2 rounded bg-slate-800 text-white"
+              className="notes-area"
               value={lead.notes || ""}
               placeholder="Add notes or CRM comments"
               rows={3}
@@ -235,23 +208,38 @@ const Dashboard = () => {
               }}
             />
             {notesStatus[lead.id] === "saving" && (
-              <p className="text-yellow-300 mt-1 text-sm">🕒 Saving...</p>
+              <p className="text-yellow-300">🕒 Saving...</p>
             )}
             {notesStatus[lead.id] === "saved" && (
-              <p className="text-green-400 mt-1 text-sm">✅ Saved</p>
+              <p className="text-green-400">✅ Saved</p>
             )}
           </div>
         ))}
       </div>
 
-      {lastDoc && (
+      {/* {lastDoc && (
         <button
           onClick={() => fetchLeads()}
-          className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          className="btn btn-load-more"
         >
           Load More Leads
         </button>
-      )}
+      )} */}
+
+      <div className="controls">
+        <button
+          onClick={() => window.open("https://YOUR_STRIPE_PORTAL_URL", "_blank")}
+          className="btn btn-manage"
+        >
+          Manage Subscription
+        </button>
+        <button
+          onClick={() => signOut(auth)}
+          className="btn btn-signout"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   );
 };
