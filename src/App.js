@@ -20,7 +20,7 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/leadform" element={<LeadForm />} />
       <Route path="/login" element={<OfficerLogin />} />
-      <Route path="/signup" element={<OfficerSignup />} />
+      <Route path="/officer-leads" element={<OfficerSignup />} />
 
       <Route
         path="/dashboard"

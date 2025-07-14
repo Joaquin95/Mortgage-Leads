@@ -49,6 +49,22 @@ const OfficerSignup = () => {
   };
 
   return (
+    <section className="lead-form" data-aos="zoom-in">
+    <h2 className="form-heading">🎯 Join the Network of Verified Loan Officers</h2>
+    <p className="text-center mb-4 text-slate-200 text-base leading-relaxed">
+      TexasMortgageLeads.com is built for licensed professionals like you.
+      Once verified, you’ll gain access to high-intent leads, a CRM-style dashboard, and flexible quota-based routing. We verify each partner’s NMLS registration to ensure professionalism and trust.
+    </p>
+
+<div className="flex justify-center items-center mb-6">
+      <img
+        src="/images/GenerateAProfessio.png"
+        alt="NMLS Verified Badge"
+        className="h-16 w-auto"
+      />
+    </div>
+
+
     <form onSubmit={handleSignup} className="lead-form">
       <h2 className="form-heading">Create Loan Officer Account</h2>
 
@@ -87,10 +103,14 @@ const OfficerSignup = () => {
       </div>
       {error && <p className="error">{error}</p>}
       <button type="submit" className="submit-button">
-        Create Account
+       ✅ Verify & Create Account
       </button>
     </form>
-  );
-};
+  <p className="mt-4 text-sm text-slate-400 text-center">
+      Your NMLS number is used for verification only. We do not share it publicly.
+    </p>
+  </section>
+);
+}
 
 export default OfficerSignup;

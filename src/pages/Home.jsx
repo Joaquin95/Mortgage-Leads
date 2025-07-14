@@ -1,32 +1,270 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "../App.css"; 
+import AOS from "aos";
+import "aos/dist/aos.css";
+import "../App.css";
 
 const Home = () => {
+  useEffect(() => {
+    AOS.init({ duration: 1000 });
+  }, []);
+
+  const [loanAmount, setLoanAmount] = useState("");
+  const [interestRate, setInterestRate] = useState("");
+  const [termYears, setTermYears] = useState("");
+  const [monthlyPayment, setMonthlyPayment] = useState(null);
+  const [totalPayment, setTotalPayment] = useState(null);
+  const [taxEstimate, setTaxEstimate] = useState(null);
+  const [insuranceEstimate, setInsuranceEstimate] = useState(null);
+
+  const calculateEstimates = () => {
+    const P = parseFloat(loanAmount);
+    const r = parseFloat(interestRate) / 100 / 12;
+    const n = parseFloat(termYears) * 12;
+
+    if (P && r && n) {
+      const basePayment =
+        (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      const tax = (P * 0.012) / 12;
+      const insurance = 100;
+
+      const totalMonthly = basePayment + tax + insurance;
+      setMonthlyPayment(totalMonthly.toFixed(2));
+      setTotalPayment((totalMonthly * n).toFixed(2));
+      setTaxEstimate(tax.toFixed(2));
+      setInsuranceEstimate(insurance.toFixed(2));
+    } else {
+      setMonthlyPayment(null);
+      setTotalPayment(null);
+      setTaxEstimate(null);
+      setInsuranceEstimate(null);
+    }
+  };
+
+  useEffect(() => {
+    calculateEstimates();
+  }, [loanAmount, interestRate, termYears]);
+
+  const applyPreset = (type) => {
+    if (type === "FHA") {
+      setInterestRate("5.0");
+      setTermYears("30");
+    }
+    if (type === "VA") {
+      setInterestRate("4.75");
+      setTermYears("30");
+    }
+  };
+
   return (
     <div className="home-wrapper">
-      <div className="hero">
+      {/* CLIENT-FACING SECTION */}
+      <div className="hero" data-aos="fade-up">
         <h1>Exclusive Texas Mortgage Leads That Convert</h1>
         <p>High-quality leads, direct from search. No contracts. No fluff.</p>
-        <Link to="/leadform">
-          <button className="cta-button">Get My Free Quote</button>
-        </Link>
+        <section className="lead-form" data-aos="zoom-in">
+          <h2 className="form-heading">Ready to Get Started?</h2>
+          <p className="text-center mb-4">
+            Fill out our quick form to receive your personalized mortgage quote.
+          </p>
+          <Link to="/leadform">
+            <button className="cta-button">📋 Get My Free Quote</button>
+          </Link>
+        </section>
       </div>
 
-      <section className="why-leads">
-        <div className="why-content">
-          <h2>Why Choose Our Leads?</h2>
-          <ul>
-            <li>✅ Primarily generated from Google Search – the highest intent traffic.</li>
-            <li>✅ Licensed Professional Loan Officers</li>
-            <li>✅ No Obligation – pay only for leads you want.</li>
-            <li>✅ Pause anytime – total control over your lead flow.</li>
-          </ul>
+      <section className="why-content" data-aos="fade-up">
+        <h2 className="card-heading  text-2xl md:text-3xl mb-4">
+          🧠 What Is a Mortgage Quote?
+        </h2>
+        <p className="text-lg leading-relaxed mb-6">
+          A mortgage quote estimates how much you could borrow, your interest
+          rate, and projected monthly payment — based on your credit score,
+          income, and property type.
+        </p>
+        <div className="bg-slate-700 p-4 rounded-lg shadow-md text-slate-100">
+          <h3 className="text-xl font-semibold mb-2">Popular Loan Programs:</h3>
+
+          <p className="mb-4">
+            <strong className="text-blue-300">🏠 Conventional Loan:</strong>
+            <br />
+            Perfect for borrowers with strong credit and stable income.
+            Typically requires at least <strong>3% down</strong> and offers
+            competitive rates.
+          </p>
+
+          <p className="mb-4">
+            <strong className="text-green-300">🛡️ FHA Loan:</strong>
+            <br />
+            Backed by the government and ideal for first-time buyers or credit
+            scores under 680. Lower down payments, flexible qualifying terms.
+          </p>
+
+          <p className="mb-4">
+            <strong className="text-yellow-300">🎖️ VA Loan:</strong>
+            <br />
+            Available for veterans and active military. Requires{" "}
+            <strong>$0 down</strong>, includes favorable interest rates, and no
+            private mortgage insurance.
+          </p>
+
+          <p className="text-lg mt-6">
+            Our officers are trained to walk you through each program and help
+            compare options based on your goals and finances.
+          </p>
+
+          <Link to="/leadform">
+            <button className="cta-button mt-4">
+              📬 Get My Personalized Quote
+            </button>
+          </Link>
         </div>
       </section>
 
-      <section className="trusted">
-        <h3>Trusted by Professional Licensed Loan Officers</h3>
+      <section className="lead-form" data-aos="zoom-in">
+        <h2 className="form-heading">🧮 Estimate Your Monthly Payment</h2>
+        <p className="text-center mb-4">
+          Enter a few details below to see an estimated mortgage payment
+          including taxes and insurance.
+        </p>
+
+        <div className="form-grid mt-6">
+          <input
+            type="number"
+            placeholder="Loan Amount (e.g. 300000)"
+            value={loanAmount}
+            onChange={(e) => setLoanAmount(e.target.value)}
+            className="p-3 rounded bg-white text-black"
+          />
+          <input
+            type="number"
+            placeholder="Interest Rate (%)"
+            value={interestRate}
+            onChange={(e) => setInterestRate(e.target.value)}
+            className="p-3 rounded bg-white text-black"
+          />
+          <input
+            type="number"
+            placeholder="Term Length (Years)"
+            value={termYears}
+            onChange={(e) => setTermYears(e.target.value)}
+            className="p-3 rounded bg-white text-black"
+          />
+          <input
+            type="text"
+            readOnly
+            value={
+              monthlyPayment !== null
+                ? `$${monthlyPayment} /mo`
+                : "Estimated Payment"
+            }
+            className="p-3 rounded bg-slate-200 text-black font-semibold"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <button
+            className="submit-button bg-blue-600 hover:bg-blue-700"
+            onClick={() => applyPreset("FHA")}
+          >
+            💼 FHA Preset
+          </button>
+          <button
+            className="submit-button bg-green-600 hover:bg-green-700"
+            onClick={() => applyPreset("VA")}
+          >
+            🎖️ VA Preset
+          </button>
+        </div>
+
+        {monthlyPayment && (
+          <div className="mt-6 text-slate-100">
+            <p>
+              <strong>Estimated Monthly Payment:</strong> ${monthlyPayment}
+            </p>
+            <p>
+              <strong>Total Over Loan Term:</strong> ${totalPayment}
+            </p>
+            <p>
+              <strong>Property Tax Estimate:</strong> ${taxEstimate} /mo
+            </p>
+            <p>
+              <strong>Homeowners Insurance:</strong> ${insuranceEstimate} /mo
+            </p>
+
+            <Link to="/leadform">
+              <button className="cta-button mt-4">
+                📬 Request Official Quote
+              </button>
+            </Link>
+          </div>
+        )}
+
+        <p className="mt-4 text-sm text-slate-300 text-center">
+          *This is a rough estimate. Final quote varies based on credit score,
+          down payment, and location.
+        </p>
+      </section>
+
+      {/* LOAN OFFICER SECTION */}
+      <section
+        className="why-content bg-slate-800 pt-10 pb-10 mt-12"
+        data-aos="fade-up"
+      >
+        <h2 className="card-heading mt-6">
+          📢 For Licensed Loan Officers Exclusive Texas Mortgage Leads That
+          Convert
+        </h2>
+        <p>
+          Join a lead marketplace trusted by mortgage pros across Texas. We
+          deliver serious buyers ready to take action — with smart routing and
+          dashboard tools.
+        </p>
+        <ul className="why-content-list">
+          <li>📨 Leads delivered instantly to your inbox</li>
+          <li>📊 CRM dashboard with built-in lead tracking and notes</li>
+          <li>📦 Purchase leads in packs of 5, 10, or 20 — no contracts</li>
+          <li>⏱️ Pause or upgrade anytime</li>
+          <li>
+            📨 High-quality leads, direct from search. No contracts. No fluff.
+          </li>
+        </ul>
+        <section className="why-leads bg-slate-900" data-aos="fade-right">
+          <div className="why-content">
+            <h2 className="card-heading">Why Customers Trust Us</h2>
+            <ul className="why-content-list">
+              <li>
+                ✅ Primarily generated from Google Search – real buyers, not
+                cold calls
+              </li>
+              <li>✅ Matched with licensed Texas loan officers</li>
+              <li>✅ No obligation – receive guidance, not pressure</li>
+              <li>✅ Fast and confidential – tailored quotes within hours</li>
+            </ul>
+          </div>
+        </section>
+        <Link to="/signup">
+          <button className="cta-button">🚀 Join TexasMortgageLeads.com</button>
+        </Link>
+      </section>
+
+      {/* Trusted */}
+      <section className="trusted text-center" data-aos="fade-up">
+        <h3>✅ Trusted by Licensed Loan Officers Across Texas</h3>
+      </section>
+
+      {/* CONTACT */}
+      <section className="contact why-content" data-aos="fade-up">
+        <h2 className="card-heading">Contact Us</h2>
+        <p>
+          Have questions? Reach out to us at{" "}
+          <a
+            href="mailto:mintinvestments95@gmail.com"
+            className="text-blue-300 underline"
+          >
+            mintinvestments95@gmail.com
+          </a>
+        </p>
       </section>
     </div>
   );

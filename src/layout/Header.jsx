@@ -11,7 +11,7 @@ const Header = () => {
         <Link to="/">Home</Link>
         <Link to="/leadform">Get Quote</Link>
         <Link to="/login">Login</Link>
-        <Link to="/signup">Signup</Link>
+        <Link to="/officer-leads">Loan Officer Leads</Link>
         {currentUser?.email === "Mintinvestments95@gmail.com" && (
           <Link to="/admin">Admin</Link>
         )}

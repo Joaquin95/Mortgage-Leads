@@ -87,7 +87,7 @@ const LeadForm = () => {
   return (
     <form onSubmit={handleSubmit} className="lead-form p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-4 text-center text-slate-800">
-        🏡 Request a Free Mortgage Quote from Texas Loan Officers
+        🏡 Request a Mortgage Quote from our Top Loan Officers!
       </h2>
 
       <div className="form-grid grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
@@ -127,7 +127,7 @@ const LeadForm = () => {
         />
         <input
           name="zip"
-          placeholder="Texas ZIP Code"
+          placeholder="ZIP Code"
           value={formData.zip}
           onChange={handleChange}
           required
