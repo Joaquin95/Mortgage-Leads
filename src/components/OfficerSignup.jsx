@@ -48,8 +48,9 @@ const OfficerSignup = () => {
       await setDoc(doc(db, "loanOfficers", res.user.uid), {
         email,
         nmls,
-        leadsSentThisMonth: 0,
         subscription: null,
+        leadsSentThisMonth: 0,
+        notes: "", // new field
       });
 
       navigate("/dashboard");

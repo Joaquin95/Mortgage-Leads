@@ -104,10 +104,10 @@ const Dashboard = () => {
   }, [fetchLeads, filterStatus]);
 
   if (loading) {
-    return <p className="text-white p-4">⏳ Loading dashboard...</p>;
+    return <p className="text-center">⏳ Loading dashboard...</p>;
   }
   if (!user) {
-    return <p className="text-white p-4">❌ Please log in to continue.</p>;
+    return <p className="text-center">❌ Please log in to continue.</p>;
   }
   if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     return <AdminPanel />;
@@ -129,10 +129,7 @@ const Dashboard = () => {
             📈 Leads Used: <strong>{leadsUsed}</strong> / {max}
           </p>
           <div className="progress-bar-container">
-            <div
-              className="progress-bar"
-              style={{ width: `${percent}%` }}
-            />
+            <div className="progress-bar" style={{ width: `${percent}%` }} />
           </div>
         </div>
       ) : (
@@ -159,69 +156,91 @@ const Dashboard = () => {
       <div className="lead-grid">
         {leads.map((lead) => (
           <div key={lead.id} className="lead-card">
-            <p><strong>Name:</strong> {lead.name}</p>
-            <p><strong>Email:</strong> {lead.email}</p>
-            <p><strong>Phone:</strong> {lead.phone}</p>
-            <p><strong>City:</strong> {lead.city || "—"}</p>
-            <p><strong>ZIP:</strong> {lead.zip}</p>
-            <p><strong>Loan Type:</strong> {lead.loanType}</p>
-            <p><strong>Loan Amount:</strong> ${lead.loanAmount}</p>
-            <p><strong>Credit Score:</strong> {lead.creditScore}</p>
-            <p><strong>Property Type:</strong> {lead.propertyType}</p>
-            <p><strong>Occupancy:</strong> {lead.occupancy}</p>
-            <p><strong>Home Buyer Type:</strong> {lead.homeBuyerType}</p>
-            <p>
-              <strong>Submitted:</strong>{" "}
-              {lead.timestamp?.toDate().toLocaleString()}
-            </p>
+            <div className="card-col">
+              <p>
+                <strong>Name:</strong> {lead.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {lead.email}
+              </p>
+              <p>
+                <strong>Phone:</strong> {lead.phone}
+              </p>
+              <p>
+                <strong>City:</strong> {lead.city || "—"}
+              </p>
+              <p>
+                <strong>ZIP:</strong> {lead.zip}
+              </p>
+              <p>
+                <strong>Loan Type:</strong> {lead.loanType}
+              </p>
+              <p>
+                <strong>Loan Amount:</strong> ${lead.loanAmount}
+              </p>
+              <p>
+                <strong>Credit Score:</strong> {lead.creditScore}
+              </p>
+              <p>
+                <strong>Property Type:</strong> {lead.propertyType}
+              </p>
+              <p>
+                <strong>Occupancy:</strong> {lead.occupancy}
+              </p>
+              <p>
+                <strong>Home Buyer Type:</strong> {lead.homeBuyerType}
+              </p>
+              <p>
+                <strong>Submitted:</strong>{" "}
+                {lead.timestamp?.toDate().toLocaleString()}
+              </p>
+            </div>
 
-            <label>Status:</label>
-            <select
-              className="status-select"
-              value={lead.status || "New"}
-              onChange={async (e) => {
-                await updateDoc(doc(db, "leads", lead.id), {
-                  status: e.target.value,
-                });
-              }}
-            >
-              <option value="New">New</option>
-              <option value="Contacted">Contacted</option>
-              <option value="Closed">Closed</option>
-            </select>
-
-            <p className="mt-4"><strong>Notes:</strong></p>
-            <textarea
-              className="notes-area"
-              value={lead.notes || ""}
-              placeholder="Add notes or CRM comments"
-              rows={3}
-              onChange={async (e) => {
-                const text = e.target.value;
-                setNotesStatus((s) => ({ ...s, [lead.id]: "saving" }));
-                await updateDoc(doc(db, "leads", lead.id), { notes: text });
-                setNotesStatus((s) => ({ ...s, [lead.id]: "saved" }));
-                setTimeout(
-                  () => setNotesStatus((s) => ({ ...s, [lead.id]: "" })),
-                  2000
-                );
-              }}
-            />
-            {notesStatus[lead.id] === "saving" && (
-              <p className="text-yellow-300">🕒 Saving...</p>
-            )}
-            {notesStatus[lead.id] === "saved" && (
-              <p className="text-green-400">✅ Saved</p>
-            )}
+            <div className="card-side">
+              <label className="field-label">Status:</label>
+              <select
+                className="status-select"
+                value={lead.status || "New"}
+                onChange={async (e) => {
+                  await updateDoc(doc(db, "leads", lead.id), {
+                    status: e.target.value,
+                  });
+                }}
+              >
+                <option value="New">New</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <label className="field-label mt-2">Notes</label>
+              <textarea
+                className="notes-area"
+                value={lead.notes || ""}
+                placeholder="Add notes"
+                rows={3}
+                onChange={async (e) => {
+                  const text = e.target.value;
+                  setNotesStatus((s) => ({ ...s, [lead.id]: "saving" }));
+                  await updateDoc(doc(db, "leads", lead.id), { notes: text });
+                  setNotesStatus((s) => ({ ...s, [lead.id]: "saved" }));
+                  setTimeout(
+                    () => setNotesStatus((s) => ({ ...s, [lead.id]: "" })),
+                    2000
+                  );
+                }}
+              />
+              {notesStatus[lead.id] === "saving" && (
+                <p className="text-yellow-300">🕒 Saving...</p>
+              )}
+              {notesStatus[lead.id] === "saved" && (
+                <p className="text-green-400">✅ Saved</p>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
       <div className="controls">
-        <button
-          onClick={() => signOut(auth)}
-          className="signout-btn"
-        >
+        <button onClick={() => signOut(auth)} className="signout-btn">
           Sign Out
         </button>
       </div>
