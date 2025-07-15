@@ -5,7 +5,7 @@ const Stripe = require("stripe");
 const stripe = new Stripe(functions.config().stripe.secret_key);
 
 exports.createCheckoutSession = functions.https.onCall(async (data, context) => {
-  console.log("📱 App verification:", context.app); // Optional for debugging
+  console.log("📱 App verification:", context.app); 
 
   const { email, subscriptionType } = data;
   const auth = context.auth;
