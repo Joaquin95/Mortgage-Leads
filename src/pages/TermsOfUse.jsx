@@ -11,8 +11,8 @@ export default function TermsOfUse() {
 
       <h2>1. Service Description</h2>
       <p>
-        We provide a lead-generation platform. We do not underwrite loans,
-        offer credit, or act as a lender or broker.
+        We provide a lead-generation platform. We do not underwrite loans, offer
+        credit, or act as a lender or broker.
       </p>
 
       <h2>2. Subscriptions & Payments</h2>
@@ -21,10 +21,7 @@ export default function TermsOfUse() {
           Loan officers pay a flat monthly fee for lead access. We never charge
           per-lead fees.
         </li>
-        <li>
-          All payments and refunds are handled via Stripe. See our Privacy
-          Policy for details.
-        </li>
+        <li>All payments are handled via Stripe. No refunds are issued.</li>
       </ul>
 
       <h2>3. User Obligations</h2>

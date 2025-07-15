@@ -612,3 +612,120 @@ body {
 .footer-link:hover {
   text-decoration: underline;
 }
+/* ───────────────────────────────────────────────────────────────
+   Officer Signup “Why Join Now?”
+─────────────────────────────────────────────────────────────── */
+.signup-why {
+  background: #1e293b;       /* dark slate */
+  color: #dbe3f4;            /* off-white */
+  padding: 2rem 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.signup-why h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.signup-why ul {
+  list-style: none;
+  padding: 0;
+}
+
+.signup-why ul li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.signup-why ul li::before {
+  content: "✔️";
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Officer Signup “How It Works”
+─────────────────────────────────────────────────────────────── */
+.signup-how {
+  background: #0f172a;    /* darker slate */
+  color: #cbd5e1;         /* light blue-gray */
+  padding: 2rem 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.signup-how h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.signup-how ol {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+}
+
+.signup-how ol li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: start;
+}
+
+.signup-how ol li::before {
+  counter-increment: step;
+  content: counter(step);
+  background: #0e54f7;   /* blue accent */
+  color: #fff;
+  font-weight: bold;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Officer Signup CTA
+─────────────────────────────────────────────────────────────── */
+.signup-cta {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.signup-cta h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.signup-cta .cta-button {
+  background-color: #0e54f7;
+  color: #fff;
+  font-size: 1.125rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-cta .cta-button:hover {
+  background-color: #0b4fed;
+}
+
+.signup-cta .small {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+.error {
+  color: #f87171;
+  font-weight: 600;
+  margin-top: 12px;
+}

@@ -17,9 +17,7 @@ export default function Footer() {
       </div>
       <p>© 2025 Texas Mortgage Leads. All rights reserved.</p>
       <p>
-        Texas Mortgage Leads is not a lender or broker. We do not offer loans,
-        take applications, or make credit decisions. We connect users with
-        licensed mortgage professionals.
+        TexasMortgageLead.com is a lead generation platform that connects Texas consumers with licensed mortgage loan officers. We do not take applications, make credit decisions, or offer loan terms. All loan inquiries are forwarded to licensed professionals. Not affiliated with any government agency.
       </p>
     </footer>
   );

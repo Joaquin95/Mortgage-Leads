@@ -72,7 +72,7 @@ const OfficerSignup = () => {
         dashboard, and flexible quota-based routing. We verify each partner's
         NMLS registration to ensure professionalism and trust.
       </p>
-
+      <h2 className="form-heading">🚀 Ready to Fuel Your Pipeline?</h2>
       <form onSubmit={handleSignup} className="lead-form">
         <h2 className="form-heading">Create Loan Officer Account</h2>
 
@@ -114,6 +114,62 @@ const OfficerSignup = () => {
           {loading ? "Creating Account..." : "✅ Verify & Create Account"}
         </button>
       </form>
+      <section className="signup-why">
+        <h2>👍 Why Join Now?</h2>
+        <ul>
+          <li>
+            🔥 Verified, High-Intent Leads Consumers on our site have already
+            raised their hand for a mortgage quote.
+          </li>
+          <li>
+            🛡️ Exclusive to You No shared leads, no bidding wars—you get the
+            first crack at every contact.
+          </li>
+          <li>
+            💰 Flat-Rate, Predictable Pricing One simple monthly fee, no
+            per-lead nickel-and-diming.
+          </li>
+          <li>
+            🤝 Instant CRM & Email Delivery Webhooks or Zapier—leads hit your
+            inbox and your pipeline in real-time.
+          </li>
+          <li>
+            ✅ Built-in Compliance & Reporting Fully RESPA-safe, NMLS-ready
+            disclosures, and straightforward performance metrics.
+          </li>
+          <li>
+            📈 Proven Conversion Tools Dashboard reminders, status updates, and
+            email templates to turn more clicks into applications.
+          </li>
+          <li>
+            🏆 Texas-Only, Hyper-Local Focus Leads only from Texas zip codes—no
+            out-of-state tire-kickers.
+          </li>
+          <li> 🤝No contracts, no per-lead fees—cancel anytime.</li>
+        </ul>
+      </section>
+
+      <section className="signup-how">
+        <h2>🛠️ How It Works</h2>
+        <ol>
+          <li>
+          <strong>Sign Up, Create your account, We'll verify your NMLS in less than 24hrs, and then pick your plan.</strong> 
+            
+          </li>
+          <li>
+         <strong>  Set Your Preferences
+            Choose between three, six or ten monthly leads for your pipeline.</strong> 
+          </li>
+          <li>
+          <strong>
+            New contacts fire off to your email and CRM the moment they submit.</strong> 
+          </li>
+          <li>
+           <strong>Track & Optimize
+            Use our dashboard for lead status and customize notes.</strong> 
+          </li>
+        </ol> 
+      </section>
       <p className="mt-4 text-sm text-slate-400 text-center">
         Your NMLS number is used for verification only. We do not share it
         publicly.

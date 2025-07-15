@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -17,7 +17,8 @@ const Home = () => {
   const [taxEstimate, setTaxEstimate] = useState(null);
   const [insuranceEstimate, setInsuranceEstimate] = useState(null);
 
-  const calculateEstimates = () => {
+  // wrap in useCallback so it's stable across renders
+  const calculateEstimates = useCallback(() => {
     const P = parseFloat(loanAmount);
     const r = parseFloat(interestRate) / 100 / 12;
     const n = parseFloat(termYears) * 12;
@@ -39,22 +40,11 @@ const Home = () => {
       setTaxEstimate(null);
       setInsuranceEstimate(null);
     }
-  };
+  }, [loanAmount, interestRate, termYears]);
 
   useEffect(() => {
     calculateEstimates();
-  }, [loanAmount, interestRate, termYears]);
-
-  const applyPreset = (type) => {
-    if (type === "FHA") {
-      setInterestRate("5.0");
-      setTermYears("30");
-    }
-    if (type === "VA") {
-      setInterestRate("4.75");
-      setTermYears("30");
-    }
-  };
+  }, [calculateEstimates]);
 
   return (
     <div className="home-wrapper">
@@ -113,8 +103,8 @@ const Home = () => {
           </p>
 
           <p className="text-lg mt-6">
-            Our officers are professional and Licensed to walk you through each program and help
-            compare options based on your goals and finances.
+            Our officers are professional and Licensed to walk you through each
+            program and help compare options based on your goals and finances.
           </p>
 
           <Link to="/leadform">
@@ -164,21 +154,6 @@ const Home = () => {
             }
             className="p-3 rounded bg-slate-200 text-black font-semibold"
           />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <button
-            className="submit-button bg-blue-600 hover:bg-blue-700"
-            onClick={() => applyPreset("FHA")}
-          >
-            💼 FHA Preset
-          </button>
-          <button
-            className="submit-button bg-green-600 hover:bg-green-700"
-            onClick={() => applyPreset("VA")}
-          >
-            🎖️ VA Preset
-          </button>
         </div>
 
         {monthlyPayment && (
@@ -235,15 +210,31 @@ const Home = () => {
         </ul>
         <section className="why-leads bg-slate-900" data-aos="fade-right">
           <div className="why-content">
-            <h2 className="card-heading">Why Customers Trust Us</h2>
+            <h2 className="card-heading">Why Mortgage Pros Choose Texas Mortgage Leads</h2>
             <ul className="why-content-list">
               <li>
-                ✅ Primarily generated from Google Search – real buyers, not
-                cold calls
+                ✅ Exclusive, high-intent Texas buyer leads—no cold calls,
+                just prospects actively shopping.
               </li>
-              <li>✅ Matched with licensed Texas loan officers</li>
-              <li>✅ No obligation – receive guidance, not pressure</li>
-              <li>✅ Fast and confidential – tailored quotes within hours</li>
+              <li>
+                ✅ Instant lead delivery via email and dashboard so you can
+                follow up in minutes.
+              </li>
+              <li>
+                ✅ Flat-rate subscription—predictable cost, zero per-lead
+                surprises.
+              </li>
+              <li>
+                ✅ Built-in CRM tools—notes, status updates, and reminders all
+                in one place.
+              </li>
+              <li>
+                ✅ Fully RESPA-compliant and Texas-licensed—peace of mind for every referral.
+              </li>
+              <li>
+                ✅ Dedicated support—concierge onboarding and 24/7 troubleshooting to keep you selling.
+
+              </li>
             </ul>
           </div>
         </section>
@@ -262,12 +253,7 @@ const Home = () => {
         <h2 className="card-heading">Contact Us</h2>
         <p>
           Have questions? Reach out to us at{" "}
-          <a
-            href="mailto:mintinvestments95@gmail.com"
-            className="contact-link"
-
-
-          >
+          <a href="mailto:mintinvestments95@gmail.com" className="contact-link">
             mintinvestments95@gmail.com
           </a>
         </p>
