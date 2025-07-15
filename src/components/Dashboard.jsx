@@ -217,25 +217,10 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* {lastDoc && (
-        <button
-          onClick={() => fetchLeads()}
-          className="btn btn-load-more"
-        >
-          Load More Leads
-        </button>
-      )} */}
-
       <div className="controls">
         <button
-          onClick={() => window.open("https://YOUR_STRIPE_PORTAL_URL", "_blank")}
-          className="btn btn-manage"
-        >
-          Manage Subscription
-        </button>
-        <button
           onClick={() => signOut(auth)}
-          className="btn btn-signout"
+          className="signout-btn"
         >
           Sign Out
         </button>

@@ -46,7 +46,7 @@ html {
 }
 
 .cta-button:hover {
-   transform: scale(1.05);
+  transform: scale(1.05);
   background-color: #6d8dd6;
 }
 
@@ -194,8 +194,8 @@ select:focus {
 main {
   flex: 1;
   overflow-y: auto;
-  margin-top: 80px; /* height of header */
-  margin-bottom: 60px; /* height of footer */
+  /* margin-top: 80px; height of header */
+  /* margin-bottom: 60px; height of footer */
 }
 
 /* Subscription leads styling */
@@ -262,21 +262,19 @@ main {
 
 /* Footer */
 .footer {
-  background-color: #698cdf;
+  flex-shrink: 0;
+  /* background-color: #698cdf; */
   color: white;
   text-align: center;
   padding: 1rem;
-  font-size: 100%;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
 }
+
 .footer p {
   color: #ebebeb;
   text-decoration: none;
 }
 .signout-btn {
-  background-color: #dc2626; 
+  background-color: #dc2626;
   color: white;
   font-weight: 600;
   padding: 10px 20px;
@@ -304,7 +302,7 @@ main {
 input::placeholder,
 select::placeholder,
 textarea::placeholder {
-  color: #94a3b8; 
+  color: #94a3b8;
 }
 .card-heading {
   font-size: 18px;
@@ -314,7 +312,6 @@ textarea::placeholder {
   border-bottom: 1px solid #475569;
   padding-bottom: 6px;
 }
-
 
 @keyframes fadein {
   from {
@@ -432,6 +429,8 @@ body {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
 }
 .btn {
   padding: 10px 20px;
