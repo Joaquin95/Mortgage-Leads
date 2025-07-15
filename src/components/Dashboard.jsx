@@ -25,7 +25,7 @@ import ChoosePlan from "./ChoosePlan";
 import AdminPanel from "./AdminPanel";
 
 const ADMIN_EMAIL = "mintinvestments95@gmail.com";
-const QUOTA = { Basic: 5, Standard: 10, Premium: 20 };
+const QUOTA = { Basic: 3, Standard: 6, Premium: 10 };
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);

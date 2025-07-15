@@ -58,19 +58,19 @@ const ChoosePlan = () => {
           onClick={() => handleSubscribe("basic")}
           className="plan-button green px-4 py-3 rounded-lg"
         >
-          Basic Plan (5 Leads)
+          Basic Plan (3 Leads)
         </button>
         <button
           onClick={() => handleSubscribe("standard")}
           className="plan-button blue px-4 py-3 rounded-lg"
         >
-          Standard Plan (10 Leads)
+          Standard Plan (6 Leads)
         </button>
         <button
           onClick={() => handleSubscribe("premium")}
           className="plan-button purple px-4 py-3 rounded-lg"
         >
-          Premium Plan (20 Leads)
+          Premium Plan (10 Leads)
         </button>
       </div>
     </div>
