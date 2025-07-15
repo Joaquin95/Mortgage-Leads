@@ -227,7 +227,7 @@ const Home = () => {
         <ul className="why-content-list">
           <li>📨 Leads delivered instantly to your inbox</li>
           <li>📊 CRM dashboard with built-in lead tracking and notes</li>
-          <li>📦 Purchase leads in packs of 5, 10, or 20 — no contracts</li>
+          <li>📦 Purchase leads in packs of 3, 6, or 10 — no contracts</li>
           <li>⏱️ Pause or upgrade anytime</li>
           <li>
             📨 High-quality leads, direct from search. No contracts. No fluff.
