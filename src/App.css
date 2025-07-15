@@ -37,6 +37,9 @@ html {
   background-color: #0e54f7;
   color: white;
   font-size: 1.125rem;
+  justify-content: center;
+  display: inline-flex;
+  align-items: center;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   border: none;
@@ -194,8 +197,8 @@ select:focus {
 main {
   flex: 1;
   overflow-y: auto;
-  /* margin-top: 80px; height of header */
-  /* margin-bottom: 60px; height of footer */
+  margin-top: 80px;
+  margin-bottom: 60px;
 }
 
 /* Subscription leads styling */
@@ -343,6 +346,8 @@ textarea::placeholder {
 }
 .card-heading {
   font-size: 2rem;
+  justify-content: center;
+  display: flex;
   font-weight: 700;
   margin-bottom: 1rem;
   color: #e2e8f0;
@@ -553,4 +558,12 @@ body {
   background: #475569;
   color: #fff;
   max-width: 250px;
+}
+.contact .contact-link {
+  color: #95a1e8; /* white */
+  text-decoration: none;
+}
+
+.contact .contact-link:hover {
+  text-decoration: underline;
 }

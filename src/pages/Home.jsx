@@ -60,8 +60,13 @@ const Home = () => {
     <div className="home-wrapper">
       {/* CLIENT-FACING SECTION */}
       <div className="hero" data-aos="fade-up">
-        <h1>Exclusive Texas Mortgage Leads That Convert</h1>
-        <p>High-quality leads, direct from search. No contracts. No fluff.</p>
+        <h1>
+          Find Your Perfect Texas Home and Unlock Your Homeownership Dreams
+        </h1>
+        <p>
+          Get personalized quotes,from our vetted Loan officers and unlock your
+          buying power. Just clear and honest offers.
+        </p>
         <section className="lead-form" data-aos="zoom-in">
           <h2 className="form-heading">Ready to Get Started?</h2>
           <p className="text-center mb-4">
@@ -79,8 +84,7 @@ const Home = () => {
         </h2>
         <p className="text-lg leading-relaxed mb-6">
           A mortgage quote estimates how much you could borrow, your interest
-          rate, and projected monthly payment — based on your credit score,
-          income, and property type.
+          rate, and what your monthly payment might look like before you apply.
         </p>
         <div className="bg-slate-700 p-4 rounded-lg shadow-md text-slate-100">
           <h3 className="text-xl font-semibold mb-2">Popular Loan Programs:</h3>
@@ -109,7 +113,7 @@ const Home = () => {
           </p>
 
           <p className="text-lg mt-6">
-            Our officers are trained to walk you through each program and help
+            Our officers are professional and Licensed to walk you through each program and help
             compare options based on your goals and finances.
           </p>
 
@@ -260,7 +264,9 @@ const Home = () => {
           Have questions? Reach out to us at{" "}
           <a
             href="mailto:mintinvestments95@gmail.com"
-            className="text-blue-300 underline"
+            className="contact-link"
+
+
           >
             mintinvestments95@gmail.com
           </a>
