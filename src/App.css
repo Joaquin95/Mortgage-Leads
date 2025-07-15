@@ -562,3 +562,53 @@ body {
 .contact .contact-link:hover {
   text-decoration: underline;
 }
+/* Page container for docs */
+.page-container {
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 0 16px;
+  color: #dbe3f4;
+  line-height: 1.6;
+}
+
+.page-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.page-container h2 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.page-container ul {
+  list-style: disc inside;
+  margin-top: 0.5rem;
+}
+
+.page-container a {
+  color: #0e54f7;
+  text-decoration: underline;
+}
+
+/* Footer styles */
+.footer {
+  background: #0f172a;
+  color: #cbd5e1;
+  text-align: center;
+  padding: 16px;
+  font-size: 0.875rem;
+}
+
+.footer-links {
+  margin-bottom: 8px;
+}
+
+.footer-link {
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}

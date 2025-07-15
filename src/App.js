@@ -12,7 +12,8 @@ import "./App.css";
 import { AuthProvider } from "./services/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
-
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfUse from "./pages/TermsOfUse";
 
 function AppRoutes() {
   return (
@@ -20,8 +21,9 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/leadform" element={<LeadForm />} />
       <Route path="/login" element={<OfficerLogin />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />;
+      <Route path="/terms" element={<TermsOfUse />} />;
       <Route path="/officer-leads" element={<OfficerSignup />} />
-
       <Route
         path="/dashboard"
         element={
