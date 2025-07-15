@@ -41,6 +41,14 @@ exports.handleStripeWebhook = functions
         console.error("⚠️ Stripe line item lookup failed:", err.message);
       }
 
+      // Map each subscriptionType to lead quota
+      const quotaMap = {
+        Basic: 5,
+        Standard: 10,
+        Premium: 20,
+      };
+      const monthlyQuota = quotaMap[subscriptionType] || 0;
+
       if (firebaseUID && subscription) {
         try {
           await admin.firestore().collection("loanOfficers").doc(firebaseUID).set(
@@ -48,12 +56,13 @@ exports.handleStripeWebhook = functions
               email: session.customer_email,
               subscription,
               subscriptionType,
+              monthlyQuota,
               leadsSentThisMonth: 0,
               subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
             },
             { merge: true }
           );
-          console.log(`✅ Subscription stored for UID: ${firebaseUID}`);
+          console.log(`✅ Subscription & quota stored for UID: ${firebaseUID}`);
         } catch (err) {
           console.error("🔥 Firestore update failed:", err.message);
         }

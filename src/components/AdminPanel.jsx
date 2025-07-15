@@ -1,14 +1,23 @@
-// src/components/AdminPanel.jsx
-
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../services/firebase";
-import { getDocs, collection, updateDoc, doc } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  updateDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { useAuth } from "../services/useAuth";
 
 const ADMIN_EMAIL = "mintinvestments95@gmail.com";
 
 const AdminPanel = () => {
+  const [selectedLeads, setSelectedLeads] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const { currentUser } = useAuth();
   const [officers, setOfficers] = useState([]);
 
@@ -38,9 +47,35 @@ const AdminPanel = () => {
     await updateDoc(doc(db, "loanOfficers", id), { [field]: value });
   };
 
-  const viewLeads = (id) => console.log("View leads for officer:", id);
-  const adjustSubscription = (id) =>
-    console.log("Edit subscription for officer:", id);
+  const viewLeads = async (id) => {
+    const officer = officers.find((o) => o.id === id);
+    if (!officer) return;
+
+    const q = query(
+      collection(db, "leads"),
+      where("officerEmail", "==", officer.email),
+      orderBy("timestamp", "desc"),
+      limit(20)
+    );
+    const snap = await getDocs(q);
+    const leadData = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    setSelectedLeads(leadData);
+    setShowModal(true);
+  };
+
+  const adjustSubscription = async (id) => {
+    const newPlan = prompt(
+      "Enter new subscription: basic / standard / premium"
+    );
+    if (!newPlan) return;
+    await updateDoc(doc(db, "loanOfficers", id), { subscription: newPlan });
+    setOfficers((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, subscription: newPlan } : o))
+    );
+    console.log(`📦 Subscription updated to "${newPlan}" for officer`, id);
+  };
+  
 
   return (
     <div className="dashboard-container">
@@ -117,8 +152,33 @@ const AdminPanel = () => {
           Sign Out
         </button>
       </div>
-    </div>
-  );
+      {showModal && (
+      <div className="modal-overlay">
+        <div className="modal">
+          <h3>📋 Leads for Selected Officer</h3>
+          <button className="btn btn-close" onClick={() => setShowModal(false)}>
+            ❌ Close
+          </button>
+          <div className="modal-content">
+            {selectedLeads.length === 0 ? (
+              <p>No leads found.</p>
+            ) : (
+              <ul>
+                {selectedLeads.map((lead) => (
+                  <li key={lead.id} className="modal-lead">
+                    <strong>{lead.name}</strong> ({lead.email}) — {lead.status}
+                    <br />
+                    Amount: ${lead.loanAmount} · Credit Score: {lead.creditScore}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
 };
 
 export default AdminPanel;
