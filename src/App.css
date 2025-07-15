@@ -493,8 +493,6 @@ body {
 .lead-card .card-side textarea {
   width: 100%;
 }
-*/
-
 
 /* 9. Status select & notes */
 .status-select {
@@ -518,8 +516,6 @@ body {
 .notes-area::placeholder {
   color: #94a3b8;
 }
-*/
-
 /* Utility */
 .text-center {
   text-align: center;
@@ -540,7 +536,6 @@ body {
   background: #475569;
   color: #fff;
 }
-*/
 /* Notes textarea */
 .lead-card .card-side textarea {
   padding: 8px;
