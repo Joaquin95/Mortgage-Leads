@@ -22,9 +22,9 @@ exports.sendLeadToOfficer = functions.https.onCall(
 
     const fallbackEmail = "mintinvestments95@gmail.com";
     const quota = {
-      Basic: 5,
-      Standard: 10,
-      Premium: 20,
+      Basic: 3,
+      Standard: 6,
+      Premium: 10,
     };
 
     try {
@@ -47,7 +47,12 @@ exports.sendLeadToOfficer = functions.https.onCall(
 
       const msg = {
         to: selected.email,
-        from: functions.config().sendgrid.from_email,
+        from: {
+          email: "noreply@texasmortgagelead.com",
+          name: "Texas Mortgage Leads",
+        },
+        replyTo: "texasmortgagelead@gmail.com",
+
         subject: "New Mortgage Lead",
         html: `
 <h2>New Lead</h2>
@@ -73,7 +78,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
         name,
         email,
         phone,
-        city,  
+        city,
         loanType,
         zip,
         creditScore,
