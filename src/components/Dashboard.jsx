@@ -1,5 +1,3 @@
-// src/components/Dashboard.jsx
-
 import React, { useState, useEffect, useCallback } from "react";
 import { auth, db } from "../services/firebase";
 import {
@@ -188,7 +186,7 @@ const Dashboard = () => {
                 <strong>Occupancy:</strong> {lead.occupancy}
               </p>
               <p>
-                <strong>Home Buyer Type:</strong> {lead.homeBuyerType}
+                <strong>First-time Homebuyer?:</strong> {lead.homeBuyerType}
               </p>
               <p>
                 <strong>Submitted:</strong>{" "}
