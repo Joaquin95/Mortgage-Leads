@@ -95,13 +95,39 @@ exports.sendLeadToOfficer = functions.https.onCall(
       });
 
       if (selected.id) {
-        await admin
+        const officerRef = admin
           .firestore()
           .collection("loanOfficers")
-          .doc(selected.id)
-          .update({
-            leadsSentThisMonth: admin.firestore.FieldValue.increment(1),
-          });
+          .doc(selected.id);
+        await officerRef.update({
+          leadsSentThisMonth: admin.firestore.FieldValue.increment(1),
+        });
+
+        const updatedSnap = await officerRef.get();
+        const updatedOfficer = updatedSnap.data();
+        const maxLeads = quota[updatedOfficer.subscriptionType] || 0;
+        const used = updatedOfficer.leadsSentThisMonth;
+
+        if (used >= maxLeads - 1) {
+          const alertMsg = {
+            to: selected.email,
+            from: {
+              email: "noreply@texasmortgagelead.com",
+              name: "Texas Mortgage Leads",
+            },
+            replyTo: "texasmortgagelead@gmail.com",
+            subject: "⚠️ You're nearing your monthly lead quota",
+            html: `
+<p>Hi there,</p>
+<p>You've received <strong>${used}</strong> of your <strong>${maxLeads}</strong> monthly leads.</p>
+<p>To avoid missing future leads, consider upgrading your plan or reviewing your dashboard.</p>
+<p><a href="https://texasmortgagelead.com/upgrade">🔼 Upgrade Your Plan</a></p>
+<p>Thanks for staying active!</p>
+  `,
+          };
+
+          await sgMail.send(alertMsg);
+        }
       }
 
       return { success: true, routedTo: selected.email };

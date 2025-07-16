@@ -41,11 +41,11 @@ exports.handleStripeWebhook = functions
         console.error("⚠️ Stripe line item lookup failed:", err.message);
       }
 
-      // Map each subscriptionType to lead quota
+
       const quotaMap = {
-        Basic: 5,
-        Standard: 10,
-        Premium: 20,
+        Basic: 3,
+        Standard: 6,
+        Premium: 10,
       };
       const monthlyQuota = quotaMap[subscriptionType] || 0;
 
