@@ -21,6 +21,7 @@ import {
 
 import ChoosePlan from "./ChoosePlan";
 import AdminPanel from "./AdminPanel";
+import { deleteDoc } from "firebase/firestore";
 
 const ADMIN_EMAIL = "mintinvestments95@gmail.com";
 const QUOTA = { Basic: 3, Standard: 6, Premium: 10 };
@@ -53,12 +54,8 @@ const Dashboard = () => {
       let base = query(
         collection(db, "leads"),
         where("officerEmail", "==", user.email),
+        where("deleted", "==", showTrash)
       );
-      if (showTrash) {
-  base = query(base, where("deleted", "==", true));
-} else {
-  // base = query(base, where("deleted", "!=", true));
-}
 
       if (filterStatus !== "All") {
         base = query(base, where("status", "==", filterStatus));
@@ -124,7 +121,8 @@ const Dashboard = () => {
       {overQuota ? (
         <div className="repurchase-container">
           <p className="text-warning">
-            🚫 You’ve used all {max} leads this month. Please choose a new plan to continue.
+            🚫 You’ve used all {max} leads this month. Please choose a new plan
+            to continue.
           </p>
           <ChoosePlan mandatory />
         </div>
@@ -144,7 +142,6 @@ const Dashboard = () => {
       ) : (
         <ChoosePlan />
       )}
-
 
       <div className="filter-container">
         <label>Filter by Status:</label>
@@ -226,24 +223,41 @@ const Dashboard = () => {
                       await updateDoc(doc(db, "leads", lead.id), {
                         deleted: true,
                       });
-                      setLeads((prev) => prev.filter((l) => l.id !== lead.id));
+                      await fetchLeads(true);
                     }
                   }}
                 >
                   🗑️ Delete
                 </button>
               ) : (
-                <button
-                  className="btn-restore"
-                  onClick={async () => {
-                    await updateDoc(doc(db, "leads", lead.id), {
-                      deleted: false,
-                    });
-                    setLeads((prev) => prev.filter((l) => l.id !== lead.id));
-                  }}
-                >
-                  ♻️ Restore
-                </button>
+                <>
+                  <button
+                    className="btn-restore"
+                    onClick={async () => {
+                      await updateDoc(doc(db, "leads", lead.id), {
+                        deleted: false,
+                      });
+                      await fetchLeads(true);
+                    }}
+                  >
+                    ♻️ Restore
+                  </button>
+
+                  <button
+                    className="btn-permanent-delete"
+                    onClick={async () => {
+                      const confirm = window.confirm(
+                        "Permanently delete this lead?"
+                      );
+                      if (confirm) {
+                        await deleteDoc(doc(db, "leads", lead.id));
+                        await fetchLeads(true);
+                      }
+                    }}
+                  >
+                    ❌ Delete Permanently
+                  </button>
+                </>
               )}
 
               <label className="field-label">Status:</label>
