@@ -52,9 +52,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
           name: "Texas Mortgage Leads",
         },
         replyTo: "texasmortgagelead@gmail.com",
-        name: "Support",
-
-        subject: "New Mortgage Lead",
+        subject: "New Mortgage Lead Submitted 📩",
         html: `
 <h2>New Lead</h2>
 <p><strong>Name:</strong> ${name}</p>
@@ -69,8 +67,23 @@ exports.sendLeadToOfficer = functions.https.onCall(
 <p><strong>Occupancy:</strong> ${occupancy}</p>
 <p><strong>Home Buyer Type:</strong> ${homeBuyerType}</p>
 <p>📌 Routed to: ${selected.email}</p>
-<p>📌 Sent by TexasMortgageLeads.com</p>
+<p>📌 Check your dashboard now and get connected with your client <a href="https://www.texasmortgagelead.com/login">View Dashboard</a></p>
       `,
+      };
+      const thankYouMsg = {
+        to: email,
+        from: {
+          email: "noreply@texasmortgagelead.com",
+          name: "Texas Mortgage Leads",
+        },
+        replyTo: "noreply@texasmortgagelead.com",
+        subject: "Thanks for your submission!",
+        text: "We’ll be in touch soon.",
+        html: `
+      <p>Hi ${name},</p>
+      <p>Thank you for your interest! A licensed loan officer will contact you shortly.</p>
+      <p>— <strong>TexasMortgageLead.com</strong> Team</p>
+    `,
       };
 
       await sgMail.send(msg);
@@ -117,13 +130,14 @@ exports.sendLeadToOfficer = functions.https.onCall(
               name: "Texas Mortgage Leads",
             },
             replyTo: "texasmortgagelead@gmail.com",
-            subject: "⚠️ You're nearing your monthly lead quota",
+            subject: "🚨 You're about to hit your lead limit!!!",
             html: `
 <p>Hi there,</p>
-<p>You've received <strong>${used}</strong> of your <strong>${maxLeads}</strong> monthly leads.</p>
-<p>To avoid missing future leads, consider upgrading your plan or reviewing your dashboard.</p>
-<p><a href="https://texasmortgagelead.com/upgrade">🔼 Upgrade Your Plan</a></p>
-<p>Thanks for staying active!</p>
+<p>You've received <strong>${used}</strong> of your <strong>${maxLeads}</strong> leads on your current plan.</p>
+<p>Once you hit your limit, new leads will be paused — and we don’t want you to miss a single opportunity!.</p>
+<p><a href="https://www.texasmortgagelead.com/login" style="background:#007BFF;color:#fff;padding:10px 15px;border-radius:5px;text-decoration:none;">Visit your <strong>Dashboard</strong> To 🔼 Upgrade Your Plan after your last lead is submitted.</a></p>
+<p>Thanks for being part of Texas Mortgage Leads!</p>
+<p style="font-size: 13px; color: #666;">This message was sent from a monitored system. Need help? Just reply to this email.</p>
   `,
           };
 
