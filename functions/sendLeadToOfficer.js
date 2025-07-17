@@ -81,8 +81,10 @@ exports.sendLeadToOfficer = functions.https.onCall(
         text: "We’ll be in touch soon.",
         html: `
       <p>Hi ${name},</p>
-      <p>Thank you for your interest! A licensed loan officer will contact you shortly.</p>
-      <p>— <strong>TexasMortgageLead.com</strong> Team</p>
+      <p>Thank you for your interest in a mortgage quote! A licensed loan officer will contact you shortly.</p> <p>✅ A licensed Loan Officer will review your quote</p>
+      <p>📞 You’ll get a call or email within the hour</p>
+      <p>💬 You can ask questions or tweak your quote anytime</p>
+      <p><strong>The Texas Mortgage Lead Team</strong></p>
     `,
       };
 
