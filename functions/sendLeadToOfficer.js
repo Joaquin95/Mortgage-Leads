@@ -87,6 +87,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
       };
 
       await sgMail.send(msg);
+      await sgMail.send(thankYouMsg);
 
       await admin.firestore().collection("leads").add({
         name,
