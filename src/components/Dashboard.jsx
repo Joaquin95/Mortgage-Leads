@@ -180,16 +180,7 @@ const Dashboard = () => {
           <option value="Closed">Closed</option>
         </select>
         <div className="filter-actions">
-  <button
-    className={`btn-trash-toggle ${showTrash ? "active" : ""}`}
-    onClick={() => {
-      setShowTrash((prev) => !prev);
-      setLastDoc(null);
-      fetchLeads(true);
-    }}
-  >
-    {showTrash ? "⬅️ Back to Leads" : "🗑️ View Trash Bin"}
-  </button>
+
 </div>
 
       </div>
@@ -329,6 +320,16 @@ const Dashboard = () => {
         <button onClick={() => signOut(auth)} className="signout-btn">
           Sign Out
         </button>
+         <button
+    className={`btn-trash-toggle ${showTrash ? "active" : ""}`}
+    onClick={() => {
+      setShowTrash((prev) => !prev);
+      setLastDoc(null);
+      fetchLeads(true);
+    }}
+  >
+    {showTrash ? "⬅️ Back to Leads" : "🗑️ View Trash Bin"}
+  </button>
       </div>
     </div>
   );

@@ -616,8 +616,8 @@ body {
    Officer Signup “Why Join Now?”
 ─────────────────────────────────────────────────────────────── */
 .signup-why {
-  background: #1e293b;       /* dark slate */
-  color: #dbe3f4;            /* off-white */
+  background: #1e293b; /* dark slate */
+  color: #dbe3f4; /* off-white */
   padding: 2rem 1.5rem;
   border-radius: 8px;
   margin: 2rem 0;
@@ -651,8 +651,8 @@ body {
    Officer Signup “How It Works”
 ─────────────────────────────────────────────────────────────── */
 .signup-how {
-  background: #0f172a;    /* darker slate */
-  color: #cbd5e1;         /* light blue-gray */
+  background: #0f172a; /* darker slate */
+  color: #cbd5e1; /* light blue-gray */
   padding: 2rem 1.5rem;
   border-radius: 8px;
   margin: 2rem 0;
@@ -680,7 +680,7 @@ body {
 .signup-how ol li::before {
   counter-increment: step;
   content: counter(step);
-  background: #0e54f7;   /* blue accent */
+  background: #0e54f7; /* blue accent */
   color: #fff;
   font-weight: bold;
   width: 2rem;
@@ -803,12 +803,12 @@ body {
 }
 
 .btn-trash-toggle {
-  background-color: #f3f4f6;
+  background-color: #ceddfc;
   color: #374151;
-  border: 1px solid #d1d5db;
+  border: none;
   padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
