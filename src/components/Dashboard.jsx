@@ -11,6 +11,7 @@ import {
   startAfter,
   getDocs,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   onAuthStateChanged,
@@ -18,10 +19,8 @@ import {
   browserLocalPersistence,
   signOut,
 } from "firebase/auth";
-
 import ChoosePlan from "./ChoosePlan";
 import AdminPanel from "./AdminPanel";
-import { deleteDoc } from "firebase/firestore";
 
 const ADMIN_EMAIL = "mintinvestments95@gmail.com";
 const QUOTA = { Basic: 3, Standard: 6, Premium: 10 };
@@ -35,7 +34,7 @@ const Dashboard = () => {
   const [leads, setLeads] = useState([]);
   const [lastDoc, setLastDoc] = useState(null);
   const [notesStatus, setNotesStatus] = useState({});
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(20);
   const [showTrash, setShowTrash] = useState(false);
 
   const getProgress = () => {
@@ -47,14 +46,35 @@ const Dashboard = () => {
   const { max, percent } = getProgress();
   const overQuota = subscriptionType && leadsUsed >= max;
 
+  const patchMissingDeletedFields = useCallback(async () => {
+    if (!user?.email) return;
+
+    const snap = await getDocs(
+      query(
+        collection(db, "leads"),
+        where("officerEmail", "==", user.email.toLowerCase())
+      )
+    );
+
+    const patchPromises = snap.docs.map((docSnap) => {
+      const data = docSnap.data();
+      if (data.deleted === undefined) {
+        return updateDoc(doc(db, "leads", docSnap.id), { deleted: false });
+      }
+      return Promise.resolve();
+    });
+
+    await Promise.all(patchPromises);
+  }, [user]);
+
   const fetchLeads = useCallback(
     async (reset = false) => {
       if (!user?.email) return;
 
       let base = query(
         collection(db, "leads"),
-        where("officerEmail", "==", user.email),
-        where("deleted", "==", showTrash)
+        where("officerEmail", "==", user.email.toLowerCase()),
+        where("deleted", "==", showTrash ? true : false)
       );
 
       if (filterStatus !== "All") {
@@ -99,6 +119,7 @@ const Dashboard = () => {
         }
       });
 
+      await patchMissingDeletedFields();
       await fetchLeads(true);
       setLoading(false);
 
@@ -106,7 +127,7 @@ const Dashboard = () => {
     });
 
     return () => unsubscribeAuth();
-  }, [fetchLeads, filterStatus]);
+  }, [fetchLeads, filterStatus, patchMissingDeletedFields]);
 
   if (loading) return <p className="text-center">⏳ Loading dashboard...</p>;
   if (!user)
