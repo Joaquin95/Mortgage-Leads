@@ -104,7 +104,7 @@ const AdminPanel = () => {
               <p>
                 <strong>Plan:</strong>{" "}
                 {o.subscriptionType && QUOTA[o.subscriptionType]
-                  ? `${o.subscriptionType} (${o.monthlyQuota} leads/month)`
+                  ? `${o.subscriptionType} (${o.monthlyQuota} leads)`
                   : "Not Subscribed"}
               </p>
               <p>

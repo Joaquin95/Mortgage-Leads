@@ -53,8 +53,12 @@ const Dashboard = () => {
       let base = query(
         collection(db, "leads"),
         where("officerEmail", "==", user.email),
-        where("deleted", "==", showTrash)
       );
+      if (showTrash) {
+  base = query(base, where("deleted", "==", true));
+} else {
+  // base = query(base, where("deleted", "!=", true));
+}
 
       if (filterStatus !== "All") {
         base = query(base, where("status", "==", filterStatus));
