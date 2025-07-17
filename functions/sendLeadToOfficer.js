@@ -65,9 +65,19 @@ exports.sendLeadToOfficer = functions.https.onCall(
 <p><strong>Credit Score:</strong> ${creditScore}</p>
 <p><strong>Property Type:</strong> ${propertyType}</p>
 <p><strong>Occupancy:</strong> ${occupancy}</p>
-<p><strong>Home Buyer Type:</strong> ${homeBuyerType}</p>
+<p><strong>First-time Homebuyer?:</strong> ${homeBuyerType}</p>
 <p>📌 Routed to: ${selected.email}</p>
-<p>📌 Check your dashboard now and get connected with your client <a href="https://www.texasmortgagelead.com/login">View Dashboard</a></p>
+<p>📌 Check your dashboard now and get connected with your client <a href="https://www.texasmortgagelead.com/login" style="
+  background:#007BFF;
+  color:#fff;
+  padding:10px 15px;
+  border-radius:5px;
+  text-decoration:none;
+  display:inline-block;
+">
+  🔑 View Your Dashboard
+</a>
+View Dashboard</a></p>
       `,
       };
       const thankYouMsg = {
@@ -84,7 +94,20 @@ exports.sendLeadToOfficer = functions.https.onCall(
       <p>Thank you for your interest in a mortgage quote! A licensed loan officer will contact you shortly.</p> <p>✅ A licensed Loan Officer will review your quote</p>
       <p>📞 You’ll get a call or email within the hour</p>
       <p>💬 You can ask questions or tweak your quote anytime</p>
+      <p><strong>Name:</strong> ${name}</p>
+<p><strong>Email:</strong> ${email}</p>
+<p><strong>Phone:</strong> ${phone}</p>
+<p><strong>City:</strong> ${city}</p>     
+<p><strong>Loan Type:</strong> ${loanType}</p>
+<p><strong>Loan Amount:</strong> ${loanAmount}</p>
+<p><strong>ZIP:</strong> ${zip}</p>
+<p><strong>Credit Score:</strong> ${creditScore}</p>
+<p><strong>Property Type:</strong> ${propertyType}</p>
+<p><strong>Occupancy:</strong> ${occupancy}</p>
+<p><strong>First-time Homebuyer?:</strong> ${homeBuyerType}</p>
       <p><strong>The Texas Mortgage Lead Team</strong></p>
+      <p style="font-size: 13px; color: #666;">This message was sent from a monitored system. Need help? Just reply to this email.</p>
+
     `,
       };
 
