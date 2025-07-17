@@ -17,7 +17,6 @@ const Home = () => {
   const [taxEstimate, setTaxEstimate] = useState(null);
   const [insuranceEstimate, setInsuranceEstimate] = useState(null);
 
-  // wrap in useCallback so it's stable across renders
   const calculateEstimates = useCallback(() => {
     const P = parseFloat(loanAmount);
     const r = parseFloat(interestRate) / 100 / 12;
@@ -210,11 +209,13 @@ const Home = () => {
         </ul>
         <section className="why-leads bg-slate-900" data-aos="fade-right">
           <div className="why-content">
-            <h2 className="card-heading">Why Mortgage Pros Choose Texas Mortgage Leads</h2>
+            <h2 className="card-heading">
+              Why Mortgage Pros Choose Texas Mortgage Leads
+            </h2>
             <ul className="why-content-list">
               <li>
-                ✅ Exclusive, high-intent Texas buyer leads—no cold calls,
-                just prospects actively shopping.
+                ✅ Exclusive, high-intent Texas buyer leads—no cold calls, just
+                prospects actively shopping.
               </li>
               <li>
                 ✅ Instant lead delivery via email and dashboard so you can
@@ -229,16 +230,17 @@ const Home = () => {
                 in one place.
               </li>
               <li>
-                ✅ Fully RESPA-compliant and Texas-licensed—peace of mind for every referral.
+                ✅ Fully RESPA-compliant and Texas-licensed—peace of mind for
+                every referral.
               </li>
               <li>
-                ✅ Dedicated support—concierge onboarding and 24/7 troubleshooting to keep you selling.
-
+                ✅ Dedicated support—concierge onboarding and 24/7
+                troubleshooting to keep you selling.
               </li>
             </ul>
           </div>
         </section>
-        <Link to="/signup">
+        <Link to="/officer-leads">
           <button className="cta-button">🚀 Join TexasMortgageLeads.com</button>
         </Link>
       </section>
@@ -253,8 +255,8 @@ const Home = () => {
         <h2 className="card-heading">Contact Us</h2>
         <p>
           Have questions? Reach out to us at{" "}
-          <a href="mailto:mintinvestments95@gmail.com" className="contact-link">
-            mintinvestments95@gmail.com
+          <a href="mailto:texasmortgagelead@gmail.com" className="contact-link">
+            Texasmortgagelead@gmail.com
           </a>
         </p>
       </section>
