@@ -22,7 +22,7 @@ const LeadForm = () => {
 
   const texasZipRanges = [
     [75001, 79999],
-    [88500, 88599], 
+    [88500, 88599],
   ];
 
   const isTexasZip = (zip) => {
@@ -76,10 +76,39 @@ const LeadForm = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
-        <p className="text-green-700 text-xl font-semibold text-center">
-          ✅ Thank you! One of our top Loan Officer's will reach out to you soon.
-        </p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 px-6 py-12">
+        <div className="max-w-xl bg-white rounded-lg shadow-lg p-8 text-center">
+          <h2 className="text-3xl font-bold text-blue-700 mb-4">
+            🎉 Thanks for reaching out!
+          </h2>
+          <p className="text-gray-700 mb-6">
+            We’ve matched you with one of our awesome Loan Officers. They’ll be
+            in touch shortly — usually within the hour. In the meantime, kick
+            back and relax. ☕
+          </p>
+
+          <div className="bg-blue-50 rounded p-4 mb-6">
+            <h3 className="text-lg font-semibold text-blue-600 mb-2">
+              🔍 What happens next?
+            </h3>
+            <ul className="text-left text-gray-700 list-disc list-inside">
+              <li>✅ A licensed Loan Officer will review your quote</li>
+              <li>📞 You’ll get a call or email within the hour</li>
+              <li>💬 You can ask questions or tweak your quote anytime</li>
+            </ul>
+          </div>
+
+          <p className="text-sm text-gray-500">
+            ✅ Trusted by homeowners across Texas · 🏆 Rated 4.9/5 by recent
+            users
+          </p>
+          <button
+            className="cta-button"
+            onClick={() => (window.location.href = "/")}
+          >
+            🏠 Return to Home
+          </button>
+        </div>
       </div>
     );
   }
