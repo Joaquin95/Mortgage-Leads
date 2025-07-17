@@ -1,5 +1,3 @@
-// src/components/ChoosePlan.jsx
-
 import React from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { app } from "../services/firebase";

@@ -773,3 +773,7 @@ body {
   border: none;
   cursor: pointer;
 }
+.choose-plan.mandatory {
+  border: 2px solid #f59e0b;
+  background: #fff8e1;
+}

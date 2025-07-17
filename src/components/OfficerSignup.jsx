@@ -48,9 +48,12 @@ const OfficerSignup = () => {
       await setDoc(doc(db, "loanOfficers", res.user.uid), {
         email,
         nmls,
+        subscriptionType: "unknown",
         subscription: null,
+        monthlyQuota: 0,
         leadsSentThisMonth: 0,
-        notes: "", // new field
+        notes: "",
+        subscribedAt: null,
       });
 
       navigate("/dashboard");
@@ -153,22 +156,31 @@ const OfficerSignup = () => {
         <h2>🛠️ How It Works</h2>
         <ol>
           <li>
-          <strong>Sign Up, Create your account, We'll verify your NMLS in less than 24hrs, and then pick your plan.</strong> 
-            
+            <strong>
+              Sign Up, Create your account, We'll verify your NMLS in less than
+              24hrs, and then pick your plan.
+            </strong>
           </li>
           <li>
-         <strong>  Set Your Preferences
-            Choose between three, six or ten monthly leads for your pipeline.</strong> 
+            <strong>
+              {" "}
+              Set Your Preferences Choose between three, six or ten monthly
+              leads for your pipeline.
+            </strong>
           </li>
           <li>
-          <strong>
-            New contacts fire off to your email and CRM the moment they submit.</strong> 
+            <strong>
+              New contacts fire off to your email and CRM the moment they
+              submit.
+            </strong>
           </li>
           <li>
-           <strong>Track & Optimize
-            Use our dashboard for lead status and customize notes.</strong> 
+            <strong>
+              Track & Optimize Use our dashboard for lead status and customize
+              notes.
+            </strong>
           </li>
-        </ol> 
+        </ol>
       </section>
       <p className="mt-4 text-sm text-slate-400 text-center">
         Your NMLS number is used for verification only. We do not share it

@@ -14,20 +14,25 @@ import { signOut } from "firebase/auth";
 import { useAuth } from "../services/useAuth";
 
 const ADMIN_EMAIL = "mintinvestments95@gmail.com";
+const QUOTA = { Basic: 3, Standard: 6, Premium: 10 };
 
 const AdminPanel = () => {
-  const [selectedLeads, setSelectedLeads] = useState([]);
-  const [showModal, setShowModal] = useState(false);
   const { currentUser } = useAuth();
   const [officers, setOfficers] = useState([]);
+  const [selectedLeads, setSelectedLeads] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
+  // Fetch all loan officers once on mount
   useEffect(() => {
-    (async () => {
+    const fetchOfficers = async () => {
       const snap = await getDocs(collection(db, "loanOfficers"));
-      setOfficers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    })();
+      const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setOfficers(docs);
+    };
+    fetchOfficers();
   }, []);
 
+  // Deny access unless admin
   if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL) {
     return (
       <div className="dashboard-container">
@@ -36,19 +41,22 @@ const AdminPanel = () => {
     );
   }
 
+  // Handle inline field edits
   const handleFieldChange = (id, field, value) => {
     setOfficers((prev) =>
       prev.map((o) => (o.id === id ? { ...o, [field]: value } : o))
     );
   };
 
+  // Persist a single field back to Firestore
   const saveField = async (id, field) => {
     const value = officers.find((o) => o.id === id)?.[field] || "";
     await updateDoc(doc(db, "loanOfficers", id), { [field]: value });
   };
 
-  const viewLeads = async (id) => {
-    const officer = officers.find((o) => o.id === id);
+  // View last 20 leads for a given officer
+  const viewLeads = async (officerId) => {
+    const officer = officers.find((o) => o.id === officerId);
     if (!officer) return;
 
     const q = query(
@@ -59,23 +67,28 @@ const AdminPanel = () => {
     );
     const snap = await getDocs(q);
     const leadData = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
     setSelectedLeads(leadData);
     setShowModal(true);
   };
 
-  const adjustSubscription = async (id) => {
-    const newPlan = prompt(
-      "Enter new subscription: basic / standard / premium"
-    );
-    if (!newPlan) return;
-    await updateDoc(doc(db, "loanOfficers", id), { subscription: newPlan });
-    setOfficers((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, subscription: newPlan } : o))
-    );
-    console.log(`📦 Subscription updated to "${newPlan}" for officer`, id);
-  };
-  
+  // const adjustSubscription = async (id) => {    *************This code is for editing the subscription tier of an officer*************
+  //   const newTier = prompt(
+  //     "Enter new subscription tier: Basic / Standard / Premium"
+  //   );
+  //   if (!newTier || !QUOTA[newTier]) return alert("Invalid plan name");
+  //   await updateDoc(doc(db, "loanOfficers", id), {
+  //     subscriptionType: newTier,
+  //     monthlyQuota: QUOTA[newTier],
+  //     leadsSentThisMonth: 0,
+  //   });
+  //   setOfficers((prev) =>
+  //     prev.map((o) =>
+  //       o.id === id
+  //         ? { ...o, subscriptionType: newTier, monthlyQuota: QUOTA[newTier], leadsSentThisMonth: 0 }
+  //         : o
+  //     )
+  //   );
+  // }; 
 
   return (
     <div className="dashboard-container">
@@ -85,11 +98,14 @@ const AdminPanel = () => {
         {officers.map((o) => (
           <div key={o.id} className="lead-card">
             <div className="card-col">
-              <p className="officer-email">
-                <strong>Officer:</strong> {o.email}
+              <p>
+                <strong>Email:</strong> {o.email}
               </p>
               <p>
-                <strong>Subscription:</strong> {o.subscription || "None"}
+                <strong>Plan:</strong>{" "}
+                {o.subscriptionType && QUOTA[o.subscriptionType]
+                  ? `${o.subscriptionType} (${o.monthlyQuota} leads/month)`
+                  : "Not Subscribed"}
               </p>
               <p>
                 <strong>Leads This Month:</strong> {o.leadsSentThisMonth || 0}
@@ -102,26 +118,22 @@ const AdminPanel = () => {
               </label>
               <input
                 id={`nmls-${o.id}`}
-                type="number"
+                type="text"
                 className="nmls-input"
-                min="0"
-                step="1"
                 value={o.nmls || ""}
-                onChange={(e) =>
-                  handleFieldChange(o.id, "nmls", e.target.value)
-                }
+                onChange={(e) => handleFieldChange(o.id, "nmls", e.target.value)}
                 onBlur={() => saveField(o.id, "nmls")}
               />
 
               <label className="field-label" htmlFor={`notes-${o.id}`}>
-                Notes
+                Admin Notes
               </label>
               <textarea
                 id={`notes-${o.id}`}
                 rows={3}
-                value={o.notes || ""}
                 className="notes-area"
-                placeholder="Admin notes..."
+                placeholder="Enter any notes..."
+                value={o.notes || ""}
                 onChange={(e) =>
                   handleFieldChange(o.id, "notes", e.target.value)
                 }
@@ -133,13 +145,7 @@ const AdminPanel = () => {
                   onClick={() => viewLeads(o.id)}
                   className="btn btn-manage"
                 >
-                  View Leads
-                </button>
-                <button
-                  onClick={() => adjustSubscription(o.id)}
-                  className="btn btn-manage"
-                >
-                  Edit Subscription
+                  📋 View Leads
                 </button>
               </div>
             </div>
@@ -152,33 +158,35 @@ const AdminPanel = () => {
           Sign Out
         </button>
       </div>
+
       {showModal && (
-      <div className="modal-overlay">
-        <div className="modal">
-          <h3>📋 Leads for Selected Officer</h3>
-          <button className="btn btn-close" onClick={() => setShowModal(false)}>
-            ❌ Close
-          </button>
-          <div className="modal-content">
-            {selectedLeads.length === 0 ? (
-              <p>No leads found.</p>
-            ) : (
-              <ul>
-                {selectedLeads.map((lead) => (
-                  <li key={lead.id} className="modal-lead">
-                    <strong>{lead.name}</strong> ({lead.email}) — {lead.status}
-                    <br />
-                    Amount: ${lead.loanAmount} · Credit Score: {lead.creditScore}
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>📋 Leads for Selected Officer</h3>
+            <button className="btn btn-close" onClick={() => setShowModal(false)}>
+              ❌ Close
+            </button>
+            <div className="modal-content">
+              {selectedLeads.length === 0 ? (
+                <p>No leads found.</p>
+              ) : (
+                <ul>
+                  {selectedLeads.map((lead) => (
+                    <li key={lead.id} className="modal-lead">
+                      <strong>{lead.name}</strong> — {lead.email} —{" "}
+                      {lead.status}
+                      <br />
+                      Amount: ${lead.loanAmount} · Score: {lead.creditScore}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    )}
-  </div>
-);
+      )}
+    </div>
+  );
 };
 
 export default AdminPanel;

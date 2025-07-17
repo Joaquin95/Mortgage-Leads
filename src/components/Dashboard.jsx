@@ -35,6 +35,7 @@ const Dashboard = () => {
   const [lastDoc, setLastDoc] = useState(null);
   const [notesStatus, setNotesStatus] = useState({});
   const [pageSize] = useState(10);
+  const [showTrash, setShowTrash] = useState(false);
 
   const getProgress = () => {
     const max = QUOTA[subscriptionType] || 0;
@@ -42,14 +43,19 @@ const Dashboard = () => {
     return { max, percent };
   };
 
+  const { max, percent } = getProgress();
+  const overQuota = subscriptionType && leadsUsed >= max;
+
   const fetchLeads = useCallback(
     async (reset = false) => {
       if (!user?.email) return;
 
       let base = query(
         collection(db, "leads"),
-        where("officerEmail", "==", user.email)
+        where("officerEmail", "==", user.email),
+        where("deleted", "==", showTrash)
       );
+
       if (filterStatus !== "All") {
         base = query(base, where("status", "==", filterStatus));
       }
@@ -64,7 +70,7 @@ const Dashboard = () => {
       setLeads((prev) => (reset ? docs : [...prev, ...docs]));
       setLastDoc(snap.docs[snap.docs.length - 1]);
     },
-    [user, filterStatus, lastDoc, pageSize]
+    [user, filterStatus, lastDoc, pageSize, showTrash]
   );
 
   useEffect(() => {
@@ -87,7 +93,7 @@ const Dashboard = () => {
       const unsubDoc = onSnapshot(officerRef, (snap) => {
         if (snap.exists()) {
           const data = snap.data();
-          setSubscriptionType(data.subscription);
+          setSubscriptionType(data.subscriptionType);
           setLeadsUsed(data.leadsSentThisMonth || 0);
         }
       });
@@ -101,27 +107,28 @@ const Dashboard = () => {
     return () => unsubscribeAuth();
   }, [fetchLeads, filterStatus]);
 
-  if (loading) {
-    return <p className="text-center">⏳ Loading dashboard...</p>;
-  }
-  if (!user) {
+  if (loading) return <p className="text-center">⏳ Loading dashboard...</p>;
+  if (!user)
     return <p className="text-center">❌ Please log in to continue.</p>;
-  }
-  if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+  if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase())
     return <AdminPanel />;
-  }
-
-  const { max, percent } = getProgress();
 
   return (
     <div className="dashboard-container">
       <h2 className="dashboard-header">📋 Loan Officer Dashboard</h2>
 
-      {subscriptionType ? (
+      {overQuota ? (
+        <div className="repurchase-container">
+          <p className="text-warning">
+            🚫 You’ve used all {max} leads this month. Please choose a new plan to continue.
+          </p>
+          <ChoosePlan mandatory />
+        </div>
+      ) : subscriptionType ? (
         <div className="subscription-card">
           <h3>Your Subscription</h3>
           <p>
-            📦 Plan: <strong>{subscriptionType}</strong> ({max} leads/month)
+            📦 Plan: <strong>{subscriptionType}</strong> ({max} leads)
           </p>
           <p>
             📈 Leads Used: <strong>{leadsUsed}</strong> / {max}
@@ -133,6 +140,7 @@ const Dashboard = () => {
       ) : (
         <ChoosePlan />
       )}
+
 
       <div className="filter-container">
         <label>Filter by Status:</label>
@@ -149,6 +157,16 @@ const Dashboard = () => {
           <option value="Contacted">Contacted</option>
           <option value="Closed">Closed</option>
         </select>
+        <button
+          className="btn-toggle-trash"
+          onClick={() => {
+            setShowTrash((prev) => !prev);
+            setLastDoc(null);
+            fetchLeads(true);
+          }}
+        >
+          {showTrash ? "⬅️ Back to Leads" : "🗑️ View Trash Bin"}
+        </button>
       </div>
 
       <div className="lead-grid">
@@ -195,6 +213,35 @@ const Dashboard = () => {
             </div>
 
             <div className="card-side">
+              {!showTrash ? (
+                <button
+                  className="btn-delete"
+                  onClick={async () => {
+                    const confirm = window.confirm("Delete this lead?");
+                    if (confirm) {
+                      await updateDoc(doc(db, "leads", lead.id), {
+                        deleted: true,
+                      });
+                      setLeads((prev) => prev.filter((l) => l.id !== lead.id));
+                    }
+                  }}
+                >
+                  🗑️ Delete
+                </button>
+              ) : (
+                <button
+                  className="btn-restore"
+                  onClick={async () => {
+                    await updateDoc(doc(db, "leads", lead.id), {
+                      deleted: false,
+                    });
+                    setLeads((prev) => prev.filter((l) => l.id !== lead.id));
+                  }}
+                >
+                  ♻️ Restore
+                </button>
+              )}
+
               <label className="field-label">Status:</label>
               <select
                 className="status-select"
@@ -209,6 +256,7 @@ const Dashboard = () => {
                 <option value="Contacted">Contacted</option>
                 <option value="Closed">Closed</option>
               </select>
+
               <label className="field-label mt-2">Notes</label>
               <textarea
                 className="notes-area"
@@ -220,10 +268,9 @@ const Dashboard = () => {
                   setNotesStatus((s) => ({ ...s, [lead.id]: "saving" }));
                   await updateDoc(doc(db, "leads", lead.id), { notes: text });
                   setNotesStatus((s) => ({ ...s, [lead.id]: "saved" }));
-                  setTimeout(
-                    () => setNotesStatus((s) => ({ ...s, [lead.id]: "" })),
-                    2000
-                  );
+                  setTimeout(() => {
+                    setNotesStatus((s) => ({ ...s, [lead.id]: "" }));
+                  }, 2000);
                 }}
               />
               {notesStatus[lead.id] === "saving" && (
@@ -236,7 +283,6 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-
       <div className="controls">
         <button onClick={() => signOut(auth)} className="signout-btn">
           Sign Out
