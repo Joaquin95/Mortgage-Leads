@@ -179,16 +179,19 @@ const Dashboard = () => {
           <option value="Contacted">Contacted</option>
           <option value="Closed">Closed</option>
         </select>
-        <button
-          className="btn-toggle-trash"
-          onClick={() => {
-            setShowTrash((prev) => !prev);
-            setLastDoc(null);
-            fetchLeads(true);
-          }}
-        >
-          {showTrash ? "⬅️ Back to Leads" : "🗑️ View Trash Bin"}
-        </button>
+        <div className="filter-actions">
+  <button
+    className={`btn-trash-toggle ${showTrash ? "active" : ""}`}
+    onClick={() => {
+      setShowTrash((prev) => !prev);
+      setLastDoc(null);
+      fetchLeads(true);
+    }}
+  >
+    {showTrash ? "⬅️ Back to Leads" : "🗑️ View Trash Bin"}
+  </button>
+</div>
+
       </div>
 
       <div className="lead-grid">
