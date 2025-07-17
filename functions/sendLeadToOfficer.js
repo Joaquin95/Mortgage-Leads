@@ -52,6 +52,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
           name: "Texas Mortgage Leads",
         },
         replyTo: "texasmortgagelead@gmail.com",
+        name: "Support",
 
         subject: "New Mortgage Lead",
         html: `
