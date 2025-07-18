@@ -266,7 +266,7 @@ main {
 /* Footer */
 .footer {
   flex-shrink: 0;
-  /* background-color: #698cdf; */
+  background-color: #1f2937;
   color: white;
   text-align: center;
   padding: 1rem;
@@ -822,4 +822,13 @@ body {
   background-color: #fee2e2;
   color: #b91c1c;
   border-color: #fca5a5;
+}
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
 }

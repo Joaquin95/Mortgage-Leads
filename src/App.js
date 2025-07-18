@@ -48,9 +48,13 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Header />
-        <AppRoutes />
-        <Footer />
+        <div className="app-layout">
+          <Header />
+          <main className="main-content">
+            <AppRoutes />
+          </main>
+          <Footer />
+        </div>
       </Router>
     </AuthProvider>
   );
