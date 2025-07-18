@@ -76,8 +76,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
   display:inline-block;
 ">
   🔑 View Your Dashboard
-</a>
-View Dashboard</a></p>
+</a></p>
       `,
       };
       const thankYouMsg = {
