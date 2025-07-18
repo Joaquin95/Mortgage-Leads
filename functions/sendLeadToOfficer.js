@@ -67,16 +67,8 @@ exports.sendLeadToOfficer = functions.https.onCall(
 <p><strong>Occupancy:</strong> ${occupancy}</p>
 <p><strong>First-time Homebuyer?:</strong> ${homeBuyerType}</p>
 <p>📌 Routed to: ${selected.email}</p>
-<p>📌 Check your dashboard now and get connected with your client <a href="https://www.texasmortgagelead.com/login" style="
-  background:#007BFF;
-  color:#fff;
-  padding:10px 15px;
-  border-radius:5px;
-  text-decoration:none;
-  display:inline-block;
-">
-  🔑 View Your Dashboard
-</a></p>
+<p style="background:#007BFF;color:#fff;padding:10px 15px;border-radius:5px;display:inline-block;">
+  🔑 Check your dashboard now and get connected with your client.
       `,
       };
       const thankYouMsg = {
