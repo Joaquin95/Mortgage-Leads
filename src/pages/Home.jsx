@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ReactGA from "react-ga4";
 import "../App.css";
 
 const Home = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
+    ReactGA.send({ hitType: "pageview", page: "/home" });
   }, []);
 
   const [loanAmount, setLoanAmount] = useState("");
@@ -16,6 +18,16 @@ const Home = () => {
   const [totalPayment, setTotalPayment] = useState(null);
   const [taxEstimate, setTaxEstimate] = useState(null);
   const [insuranceEstimate, setInsuranceEstimate] = useState(null);
+  useEffect(() => {
+    if (monthlyPayment !== null) {
+      ReactGA.event({
+        category: "Calculator",
+        action: "Viewed Estimate Result",
+        label: "Home Estimate Tool",
+        value: parseFloat(monthlyPayment),
+      });
+    }
+  }, [monthlyPayment]);
 
   const calculateEstimates = useCallback(() => {
     const P = parseFloat(loanAmount);
@@ -107,8 +119,18 @@ const Home = () => {
           </p>
 
           <Link to="/leadform">
-            <button className="cta-button mt-4">
-              📬 Get My Personalized Quote
+            <button
+              className="cta-button"
+              onClick={() =>
+                ReactGA.event({
+                  category: "Lead",
+                  action: "Clicked Quote CTA",
+                  label: "Home Page Hero",
+                  value: 1,
+                })
+              }
+            >
+              📋 Get My Free Personalized Quote
             </button>
           </Link>
         </div>
@@ -171,8 +193,18 @@ const Home = () => {
             </p>
 
             <Link to="/leadform">
-              <button className="cta-button mt-4">
-                📬 Request Official Quote
+              <button
+                className="cta-button"
+                onClick={() =>
+                  ReactGA.event({
+                    category: "Lead",
+                    action: "Clicked Quote CTA",
+                    label: "Home Page Hero",
+                    value: 1,
+                  })
+                }
+              >
+                📋 Get My Free Personalized Quote
               </button>
             </Link>
           </div>
@@ -241,7 +273,19 @@ const Home = () => {
           </div>
         </section>
         <Link to="/officer-leads">
-          <button className="cta-button">🚀 Join TexasMortgageLeads.com</button>
+          <button
+            className="cta-button"
+            onClick={() =>
+              ReactGA.event({
+                category: "Lead",
+                action: "Clicked Texasmortgageleads.com CTA",
+                label: "Home Page Hero",
+                value: 1,
+              })
+            }
+          >
+            🚀 Join TexasMortgageLeads.com
+          </button>
         </Link>
       </section>
 

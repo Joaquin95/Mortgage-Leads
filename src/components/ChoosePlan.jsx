@@ -3,6 +3,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { app } from "../services/firebase";
 import { useAuth } from "../services/useAuth";
 import { loadStripe } from "@stripe/stripe-js";
+import ReactGA from "react-ga4";
 
 const stripePromise = loadStripe(
   "pk_test_51RUFe3FmfJpxrjsao8Ke0fu4lLUSlH6EJkdrurlD1wU8DQpy1O7WRrBOpuZnQHcRp7D24oDDKCtaKSIyx6pmpIdL00Z0iuOBEG"
@@ -21,11 +22,17 @@ const ChoosePlan = () => {
       alert("Please log in to subscribe.");
       return;
     }
+    ReactGA.event({
+      category: "Subscription",
+      action: "Clicked Plan",
+      label: subscriptionType,
+      value: 1,
+    });
 
     try {
       const { data } = await createCheckoutSession({
         email: currentUser.email,
-        subscriptionType, // "basic" | "standard" | "premium"
+        subscriptionType,
       });
 
       const sessionId = data.id;
@@ -47,8 +54,7 @@ const ChoosePlan = () => {
     <div className="plan-options p-6 bg-slate-700 rounded-lg shadow-lg text-white">
       <h3 className="text-2xl font-semibold mb-4">Choose Your Plan</h3>
       <p className="mb-6">
-        Select a plan below to start receiving high-intent Texas mortgage
-        leads.
+        Select a plan below to start receiving high-intent Texas mortgage leads.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -56,7 +62,7 @@ const ChoosePlan = () => {
           onClick={() => handleSubscribe("basic")}
           className="plan-button green px-4 py-3 rounded-lg"
         >
-          Basic Plan (3 Leads  $29.99)
+          Basic Plan (3 Leads $29.99)
         </button>
         <button
           onClick={() => handleSubscribe("standard")}
