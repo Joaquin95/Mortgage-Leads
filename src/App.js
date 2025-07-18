@@ -14,6 +14,23 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
+import ReactGA from "react-ga4";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+
+ReactGA.initialize("G-BW7QVTF32X");
+ReactGA.send("pageview");
+
+function PageTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
+
+  return null;
+}
+
 
 function AppRoutes() {
   return (
@@ -48,6 +65,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <PageTracker />
         <div className="app-layout">
           <Header />
           <main className="main-content">

@@ -5,6 +5,7 @@ import { auth, db } from "../services/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ReactGA from "react-ga4";
 
 const OfficerSignup = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +18,8 @@ const OfficerSignup = () => {
 
   useEffect(() => {
     AOS.init({ duration: 800 });
+
+    ReactGA.send({ hitType: "pageview", page: "/officer-leads" });
   }, []);
 
   const isPasswordStrong = (password) => {
@@ -54,6 +57,12 @@ const OfficerSignup = () => {
         leadsSentThisMonth: 0,
         notes: "",
         subscribedAt: null,
+      });
+      ReactGA.event({
+        category: "Officer",
+        action: "Signup",
+        label: "OfficerSignup",
+        value: 1,
       });
 
       navigate("/dashboard");
@@ -113,7 +122,19 @@ const OfficerSignup = () => {
           />
         </div>
         {error && <p className="error">{error}</p>}
-        <button type="submit" className="submit-button" disabled={loading}>
+        <button
+          type="submit"
+          className="submit-button"
+          disabled={loading}
+          onClick={() =>
+            ReactGA.event({
+              category: "Officer",
+              action: "Clicked Signup Button",
+              label: "Signup CTA",
+              value: 1,
+            })
+          }
+        >
           {loading ? "Creating Account..." : "✅ Verify & Create Account"}
         </button>
       </form>

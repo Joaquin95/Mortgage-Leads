@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { app } from "../services/firebase";
+import ReactGA from "react-ga4";
 
 const LeadForm = () => {
   const [formData, setFormData] = useState({
@@ -15,10 +16,28 @@ const LeadForm = () => {
     propertyType: "",
     occupancy: "",
     homeBuyerType: "",
+    utmSource: "",
+    utmMedium: "",
+    utmCampaign: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get("utm_source");
+    const medium = params.get("utm_medium");
+    const campaign = params.get("utm_campaign");
+
+    setFormData((prev) => ({
+      ...prev,
+      utmSource: source || "direct",
+      utmMedium: medium || "none",
+      utmCampaign: campaign || "none",
+    }));
+  }, []);
+
 
   const texasZipRanges = [
     [75001, 79999],
@@ -65,6 +84,12 @@ const LeadForm = () => {
       const functions = getFunctions(app);
       const sendLeadToOfficer = httpsCallable(functions, "sendLeadToOfficer");
       await sendLeadToOfficer(formData);
+      ReactGA.event({
+        category: "Lead",
+        action: "Submitted",
+        label: "LeadForm",
+        value: 1,
+      });
       setSubmitted(true);
     } catch (err) {
       console.error("Submission error:", err.message);
@@ -233,8 +258,18 @@ const LeadForm = () => {
           <option>No</option>
         </select>
       </div>
-
-      <button type="submit" className="submit-button">
+      <button
+        type="submit"
+        className="submit-button"
+        onClick={() =>
+          ReactGA.event({
+            category: "Lead",
+            action: "Clicked Quote Button",
+            label: "Mortgage Quote CTA",
+            value: 1,
+          })
+        }
+      >
         {loading ? "Sending..." : "🚀 Get my Mortgage Quote"}
       </button>
     </form>
