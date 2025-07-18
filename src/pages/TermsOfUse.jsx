@@ -44,6 +44,9 @@ export default function TermsOfUse() {
         These terms are governed by the laws of the State of Texas. Any disputes
         will be resolved in the courts of Dallas County.
       </p>
+      ## Disclaimer of Financial Services
+
+TexasMortgageLead.com is not a mortgage company. We do not provide lending, mortgage advice, financial recommendations, or brokerage services. Our platform facilitates lead generation by connecting users to licensed mortgage professionals who operate independently. We do not endorse or evaluate loan offers.
     </div>
   );
 }

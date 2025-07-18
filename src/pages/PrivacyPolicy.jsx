@@ -50,6 +50,7 @@ export default function PrivacyPolicy() {
           privacy@texasmortgageleads.com
         </a>.
       </p>
+      TexasMortgageLead.com operates strictly as a lead generation service. We do not provide mortgage consulting or financial services. Any communication initiated through the platform is between the user and the licensed mortgage professional, not with TexasMortgageLead.com.
     </div>
   );
 }
