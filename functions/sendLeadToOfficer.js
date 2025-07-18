@@ -18,6 +18,9 @@ exports.sendLeadToOfficer = functions.https.onCall(
       propertyType,
       occupancy,
       homeBuyerType,
+      utmSource,
+      utmMedium,
+      utmCampaign,
     } = leadData;
 
     const fallbackEmail = "mintinvestments95@gmail.com";
@@ -105,25 +108,30 @@ exports.sendLeadToOfficer = functions.https.onCall(
       await sgMail.send(msg);
       await sgMail.send(thankYouMsg);
 
-      await admin.firestore().collection("leads").add({
-        name,
-        email,
-        phone,
-        city,
-        loanType,
-        zip,
-        creditScore,
-        loanAmount,
-        propertyType,
-        occupancy,
-        homeBuyerType,
-        officerEmail: selected.email,
-        status: "New",
-        notes: "",
-        tasks: [],
-
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      await admin
+        .firestore()
+        .collection("leads")
+        .add({
+          name,
+          email,
+          phone,
+          city,
+          loanType,
+          zip,
+          creditScore,
+          loanAmount,
+          propertyType,
+          occupancy,
+          homeBuyerType,
+          officerEmail: selected.email,
+          status: "New",
+          notes: "",
+          tasks: [],
+          utmSource: utmSource || "direct",
+          utmMedium: utmMedium || "none",
+          utmCampaign: utmCampaign || "none",
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
       if (selected.id) {
         const officerRef = admin
