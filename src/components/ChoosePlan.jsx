@@ -6,7 +6,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import ReactGA from "react-ga4";
 
 const stripePromise = loadStripe(
-  "pk_test_51RUFe3FmfJpxrjsao8Ke0fu4lLUSlH6EJkdrurlD1wU8DQpy1O7WRrBOpuZnQHcRp7D24oDDKCtaKSIyx6pmpIdL00Z0iuOBEG"
+  "pk_live_51RUFdqC554m6Hyn4RpkvAJfYyzEVnSnQVIqHiKEovbKaWSkMbBwutuKzM3byi3knfwKxTKxc8mx2mnKh01vdPyWP00jUdHCjQo"
 );
 
 const ChoosePlan = () => {
