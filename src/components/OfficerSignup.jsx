@@ -15,6 +15,9 @@ const OfficerSignup = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
 
   useEffect(() => {
     AOS.init({ duration: 800 });
@@ -43,6 +46,10 @@ const OfficerSignup = () => {
       );
       return;
     }
+    if (!/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(phone)) {
+      setError("Please enter a valid 10-digit phone number.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -50,6 +57,9 @@ const OfficerSignup = () => {
 
       await setDoc(doc(db, "loanOfficers", res.user.uid), {
         email,
+        firstName,
+        lastName,
+        phone,
         nmls,
         subscriptionType: "unknown",
         subscription: null,
@@ -89,6 +99,31 @@ const OfficerSignup = () => {
         <h2 className="form-heading">Create Loan Officer Account</h2>
 
         <div className="form-grid">
+          <input
+            name="firstName"
+            type="text"
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+          <input
+            name="lastName"
+            type="text"
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+          <input
+            name="phone"
+            type="tel"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+          />
+
           <input
             name="email"
             type="email"

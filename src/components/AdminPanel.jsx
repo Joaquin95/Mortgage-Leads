@@ -22,12 +22,22 @@ const AdminPanel = () => {
   const [selectedLeads, setSelectedLeads] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [adminLeadCount, setAdminLeadCount] = useState(null);
+  const maxActiveOfficers = 100;
+  const [activeCount, setActiveCount] = useState(0);
 
   useEffect(() => {
     const fetchOfficers = async () => {
       const snap = await getDocs(collection(db, "loanOfficers"));
 
       const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const active = docs.filter(
+        (d) =>
+          d.subscribed === true ||
+          (d.subscriptionType && QUOTA[d.subscriptionType])
+      );
+
+      setActiveCount(active.length);
+
       const adminQuery = query(
         collection(db, "leads"),
         where("officerEmail", "==", ADMIN_EMAIL)
@@ -75,6 +85,7 @@ const AdminPanel = () => {
 
     const officerEmail =
       officer.email === ADMIN_EMAIL ? ADMIN_EMAIL : officer.email;
+    
 
     const q = query(
       collection(db, "leads"),
@@ -90,6 +101,13 @@ const AdminPanel = () => {
   return (
     <div className="dashboard-container">
       <h2 className="dashboard-header">🔧 Admin Panel</h2>
+      <p className="text-info">
+        🚀 Active Loan Officers: <strong>{activeCount}</strong> /{" "}
+        {maxActiveOfficers}
+        {activeCount >= maxActiveOfficers && (
+          <span className="badge badge-warning ml-2">Cap Reached</span>
+        )}
+      </p>
 
       <div className="lead-grid">
         {officers.map((o) => (
@@ -123,6 +141,17 @@ const AdminPanel = () => {
                   </p>
                 ) : null;
               })()}
+              {(o.firstName || o.lastName) && (
+                <p>
+                  <strong>Name:</strong> {o.firstName ?? "—"} {o.lastName ?? ""}
+                </p>
+              )}
+              {o.phone && o.id !== "admin" && (
+                <p>
+                  <strong>Phone number:</strong> {o.phone}
+                </p>
+              )}
+
               <p>
                 <strong>Email:</strong> {o.email}
               </p>

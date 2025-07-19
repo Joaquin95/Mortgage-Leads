@@ -6,7 +6,11 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="logo">🏡 Texas Mortgage Leads</div>
+      <Link to="/" className="logo" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "inherit" }}>
+  <img src="/TML2025.png" alt="Texas Mortgage Leads Logo" style={{ height: "40px" }} />
+  <span>Texas Mortgage Leads</span>
+</Link>
+      
       <nav>
         <Link to="/">Home</Link>
         <Link to="/leadform">Get Quote</Link>
