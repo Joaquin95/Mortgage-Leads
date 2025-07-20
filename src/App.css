@@ -94,8 +94,8 @@ body {
 /* Header */
 .header {
   background: linear-gradient(to bottom right, #1e293b, #0f172a);
-  color: white;
   height: 80px;
+  flex-direction: row;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -104,12 +104,26 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  flex-wrap: wrap;
+}
+.header-center {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
+
 .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .header {
+    justify-content: center;
+  }
 }
 
 .header nav a {

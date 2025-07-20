@@ -8,10 +8,18 @@ const Header = () => {
 
   return (
     <header className="header">
-      <Link to="/" className="logo" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "inherit" }}>
-        <img src="/TML2025.png" alt="Texas Mortgage Leads Logo" style={{ height: "40px" }} />
-        <span>Texas Mortgage Leads</span>
-      </Link>
+      {/* <div className="header-center"> */}
+        <Link
+          to="/"
+        >
+          <img
+            src="/TML20252.png"
+            alt="Texas Mortgage Leads Logo"
+            style={{ height: "200px" }}
+          />
+          {/* <span>Texas Mortgage Leads</span> */}
+        </Link>
+      {/* </div> */}
 
       <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
         ☰
