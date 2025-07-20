@@ -15,7 +15,7 @@ const Header = () => {
           <img
             src="/TML20252.png"
             alt="Texas Mortgage Leads Logo"
-            style={{ height: "200px" }}
+            style={{ height: "150px" }}
           />
           {/* <span>Texas Mortgage Leads</span> */}
         </Link>
@@ -26,14 +26,15 @@ const Header = () => {
       </button>
 
       <nav className={`nav ${menuOpen ? "open" : ""}`}>
-        <Link to="/">Home</Link>
-        <Link to="/leadform">Get Quote</Link>
-        <Link to="/login">Login</Link>
-        <Link to="/officer-leads">Loan Officer Leads</Link>
-        {currentUser?.email === "Mintinvestments95@gmail.com" && (
-          <Link to="/admin">Admin</Link>
-        )}
-      </nav>
+  <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+  <Link to="/leadform" onClick={() => setMenuOpen(false)}>Get Quote</Link>
+  <Link to="/login" onClick={() => setMenuOpen(false)}>Login</Link>
+  <Link to="/officer-leads" onClick={() => setMenuOpen(false)}>Loan Officer Leads</Link>
+  {currentUser?.email === "Mintinvestments95@gmail.com" && (
+    <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin</Link>
+  )}
+</nav>
+
     </header>
   );
 };
