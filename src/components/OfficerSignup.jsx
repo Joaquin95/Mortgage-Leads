@@ -94,7 +94,10 @@ const OfficerSignup = () => {
         dashboard, and flexible quota-based routing. We verify each partner's
         NMLS registration to ensure professionalism and trust.
       </p>
-      <h2 className="form-heading">🚀 Ready to Fuel Your Pipeline?</h2>
+      <h2 className="form-heading">
+        🚀 Ready to Fuel Your Pipeline?
+        <h5>🕓 24/7 lead delivery — even while you're off the clock</h5>
+      </h2>
       <form onSubmit={handleSignup} className="lead-form">
         <h2 className="form-heading">Create Loan Officer Account</h2>
 

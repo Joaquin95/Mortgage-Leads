@@ -74,7 +74,9 @@ const Home = () => {
             Fill out our quick form to receive your personalized mortgage quote.
           </p>
           <Link to="/leadform">
-            <button className="cta-button">📋 Get My Free Quote</button>
+            <button className="cta-button">
+              📋 Get My Free Mortgage Quote
+            </button>
           </Link>
         </section>
       </div>
@@ -231,6 +233,8 @@ const Home = () => {
           dashboard tools.
         </p>
         <ul className="why-content-list">
+          <li>🕓 24/7 lead delivery — even while you're off the clock</li>
+          <li>📈 Exclusive leads from high-intent Texas buyers</li>
           <li>📨 Leads delivered instantly to your inbox</li>
           <li>📊 CRM dashboard with built-in lead tracking and notes</li>
           <li>📦 Purchase leads in packs of 3, 6, or 10 — no contracts</li>
