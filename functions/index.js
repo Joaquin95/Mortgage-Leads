@@ -2,7 +2,6 @@ const functions          = require("firebase-functions");
 const { sendLeadToOfficer } = require("./sendLeadToOfficer");
 const { handlePayPalOrder  } = require("./handlePayPalOrder");
 const { sendLeadEmail      } = require("./sendLeadEmail");
-const { onOfficerCreate    } = require("./officerTriggers");
 const sgMail             = require("@sendgrid/mail");
 const admin              = require("./initAdmin");
 
