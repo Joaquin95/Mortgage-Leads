@@ -1,5 +1,5 @@
-const functions = require("firebase-functions");
-const admin = require("./initAdmin");
+// const functions = require("firebase-functions");
+// const admin = require("./initAdmin");
 
 
 

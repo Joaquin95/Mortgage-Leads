@@ -13,7 +13,7 @@ const ChoosePlan = () => {
     if (window.paypal) return;
     const script = document.createElement("script");
     script.src =
-      "https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"; 
+      "https://www.paypal.com/sdk/js?client-id=AYesSWUMbY4yaYkWgEApToZm9cHjTVnBQAShcZhJ2k1hziDP7CII2J0EJk1uNxeVDOABgJz3X4OWWMLs&currency=USD";
     script.async = true;
     document.body.appendChild(script);
   };
@@ -103,6 +103,7 @@ const ChoosePlan = () => {
           Premium Plan (10 Leads $99.99)
         </button>
       </div>
+      <div id="paypal-button-container" className="mt-6"></div>
     </div>
   );
 };
