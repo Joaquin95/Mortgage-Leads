@@ -13,7 +13,6 @@ sgMail.setApiKey(functions.config().sendgrid.key);
 exports.sendLeadToOfficer     = sendLeadToOfficer;
 exports.handlePayPalOrder     = handlePayPalOrder;
 exports.sendLeadEmail         = sendLeadEmail;
-exports.onOfficerCreate       = onOfficerCreate;
 
 
 
