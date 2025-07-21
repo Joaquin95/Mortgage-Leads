@@ -1,14 +1,20 @@
+// functions/sendLeadToOfficer.js
+
 const functions = require("firebase-functions");
 const admin = require("./initAdmin");
 const sgMail = require("@sendgrid/mail");
 
 sgMail.setApiKey(functions.config().sendgrid.api_key);
 
+// Your plan quotas and number of shards
+const QUOTA = { Basic: 3, Standard: 6, Premium: 10 };
+const TOTAL_SHARDS = 10;
+
 exports.sendLeadToOfficer = functions.https.onCall(
   async (leadData, context) => {
     const {
       name,
-      email,
+      email: customerEmail,
       phone,
       city,
       loanType,
@@ -18,49 +24,67 @@ exports.sendLeadToOfficer = functions.https.onCall(
       propertyType,
       occupancy,
       homeBuyerType,
-      utmSource,
-      utmMedium,
-      utmCampaign,
+      utmSource = "direct",
+      utmMedium = "none",
+      utmCampaign = "none",
     } = leadData;
 
     const fallbackEmail = "mintinvestments95@gmail.com";
-    const quota = {
-      Basic: 3,
-      Standard: 6,
-      Premium: 10,
-    };
-     const TOTAL_SHARDS = 10;
 
-try {
-      // 1. Pick a random shard
-  const shard = Math.floor(Math.random() * TOTAL_SHARDS);
+    try {
+      // 1) Pick a random shard
+      const shard = Math.floor(Math.random() * TOTAL_SHARDS);
+      console.log(`🔍 Chosen shard: ${shard}`);
 
-  // 2. Fetch that shard of officers
-  const snap = await admin.firestore()
-    .collection('loanOfficers')
-    .where('shardId', '==', shard)
-    .get();
+      // 2) Query officers in that shard
+      const snap = await admin
+        .firestore()
+        .collection("loanOfficers")
+        .where("shardId", "==", shard)
+        .get();
+      console.log(
+        `📂 Officers in shard (${snap.size}):`,
+        snap.docs.map((d) => ({
+          id: d.id,
+          email: d.data().email,
+          subscriptionType: d.data().subscriptionType,
+        }))
+      );
 
-  // 3. Filter by active subscription & under quota
-  const eligible = snap.docs
-    .map(d => ({ id: d.id, ...d.data() }))
-    .filter(o => {
-      const max = quota[o.subscriptionType] || 0;
-      return o.subscriptionType && o.leadsSentThisMonth < max;
-    });
+      // 3) Filter by active subscription & under quota
+      const eligible = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((o) => {
+          const maxLeads = QUOTA[o.subscriptionType] || 0;
+          const ok = o.subscriptionType && o.leadsSentThisMonth < maxLeads;
+          console.log(
+            `   ➤ Checking ${o.email}: used ${o.leadsSentThisMonth}/${maxLeads} → ${ok}`
+          );
+          return ok;
+        });
+      console.log(
+        `✅ Eligible after filter:`,
+        eligible.map((o) => o.email)
+      );
 
-  // 4. Sort by weighted usage
-  eligible.sort((a, b) => 
-    (a.leadsSentThisMonth / quota[a.subscriptionType])
-    (b.leadsSentThisMonth / quota[b.subscriptionType])
-  );
+      // 4) Sort by percent-of-quota used (ascending)
+      eligible.sort((a, b) => {
+        const aPct = a.leadsSentThisMonth / QUOTA[a.subscriptionType];
+        const bPct = b.leadsSentThisMonth / QUOTA[b.subscriptionType];
+        return aPct - bPct;
+      });
+      console.log(
+        `🎯 Selected candidate:`,
+        eligible.length ? eligible[0].email : fallbackEmail
+      );
 
-  // 5.  Select top candidate or fallback
-  const selected = eligible.length
-    ? eligible[0]
-    : { id: null, email: fallbackEmail };
+      // 5) Final selection
+      const selected = eligible.length
+        ? eligible[0]
+        : { id: null, email: fallbackEmail };
 
-      const msg = {
+      // 6) Build and send email to the officer
+      const officerMsg = {
         to: selected.email,
         from: {
           email: "noreply@texasmortgagelead.com",
@@ -69,34 +93,39 @@ try {
         replyTo: "texasmortgagelead@gmail.com",
         subject: "New Mortgage Lead Submitted 📩",
         html: `
-<h2>New Lead</h2>
-<p><strong>Name:</strong> ${name}</p>
-<p><strong>Email:</strong> ${email}</p>
-<p><strong>Phone:</strong> ${phone}</p>
-<p><strong>City:</strong> ${city}</p>     
-<p><strong>Loan Type:</strong> ${loanType}</p>
-<p><strong>Loan Amount:</strong> ${loanAmount}</p>
-<p><strong>ZIP:</strong> ${zip}</p>
-<p><strong>Credit Score:</strong> ${creditScore}</p>
-<p><strong>Property Type:</strong> ${propertyType}</p>
-<p><strong>Occupancy:</strong> ${occupancy}</p>
-<p><strong>First-time Homebuyer?:</strong> ${homeBuyerType}</p>
-<p>📌 Routed to: ${selected.email}</p>
-<p style="background:#007BFF;color:#fff;padding:10px 15px;border-radius:5px;display:inline-block;">
-  🔑 Check your dashboard now and get connected with your client.
+<h2>New Lead Assigned</h2>
+<ul>
+  <li><strong>Name:</strong> ${name}</li>
+  <li><strong>Email:</strong> ${customerEmail}</li>
+  <li><strong>Phone:</strong> ${phone}</li>
+  <li><strong>City:</strong> ${city}</li>
+  <li><strong>Loan Type:</strong> ${loanType}</li>
+  <li><strong>Loan Amount:</strong> ${loanAmount}</li>
+  <li><strong>ZIP:</strong> ${zip}</li>
+  <li><strong>Credit Score:</strong> ${creditScore}</li>
+  <li><strong>Property Type:</strong> ${propertyType}</li>
+  <li><strong>Occupancy:</strong> ${occupancy}</li>
+  <li><strong>First-time Homebuyer?:</strong> ${homeBuyerType}</li>
+</ul>
+<p>🔗 Routed to: <strong>${selected.email}</strong></p>
+<p style="background:#007BFF;color:#fff;padding:10px;border-radius:5px;display:inline-block;">
+  🔑 Login to your dashboard to follow up with this lead.
+</p>
       `,
       };
-      const thankYouMsg = {
-        to: email,
+
+      // 7) Thank-you email to the customer
+      const clientMsg = {
+        to: customerEmail,
         from: {
           email: "noreply@texasmortgagelead.com",
           name: "Texas Mortgage Leads",
         },
         replyTo: "noreply@texasmortgagelead.com",
-        subject: "Thanks for your submission!",
-        text: "We’ll be in touch soon.",
+        subject: "Thanks for your mortgage quote request!",
+        text: "A licensed loan officer will be in touch shortly.",
         html: `
-      <p>Hi ${name},</p>
+<p>Hi ${name},</p>
       <p>Thank you for your interest in a mortgage quote! A licensed loan officer will contact you shortly.</p> <p>✅ A licensed Loan Officer will review your quote</p>
       <p>📞 You’ll get a call or email within the hour</p>
       <p>💬 You can ask questions or tweak your quote anytime</p>
@@ -113,50 +142,48 @@ try {
 <p><strong>First-time Homebuyer?:</strong> ${homeBuyerType}</p>
       <p><strong>The Texas Mortgage Lead Team</strong></p>
       <p style="font-size: 13px; color: #666;">This message was sent from a monitored system. Need help? Just reply to this email.</p>
-
     `,
       };
 
-      await sgMail.send(msg);
-      await sgMail.send(thankYouMsg);
+      await sgMail.send(officerMsg);
+      await sgMail.send(clientMsg);
 
-      await admin
-        .firestore()
-        .collection("leads")
-        .add({
-          name,
-          email,
-          phone,
-          city,
-          loanType,
-          zip,
-          creditScore,
-          loanAmount,
-          propertyType,
-          occupancy,
-          homeBuyerType,
-          officerEmail: selected.email,
-          status: "New",
-          notes: "",
-          tasks: [],
-          utmSource: utmSource || "direct",
-          utmMedium: utmMedium || "none",
-          utmCampaign: utmCampaign || "none",
-          timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        });
+      // 8) Record the lead in Firestore
+      await admin.firestore().collection("leads").add({
+        name,
+        email: customerEmail,
+        phone,
+        city,
+        loanType,
+        zip,
+        creditScore,
+        loanAmount,
+        propertyType,
+        occupancy,
+        homeBuyerType,
+        officerEmail: selected.email,
+        status: "New",
+        notes: "",
+        tasks: [],
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
+      // 9) Increment officer’s usage and send near-limit alert if needed
       if (selected.id) {
-        const officerRef = admin
+        const ref = admin
           .firestore()
           .collection("loanOfficers")
           .doc(selected.id);
-        await officerRef.update({
+        await ref.update({
           leadsSentThisMonth: admin.firestore.FieldValue.increment(1),
         });
-        const updatedSnap = await officerRef.get();
-        const updatedOfficer = updatedSnap.data();
-        const maxLeads = quota[updatedOfficer.subscriptionType] || 0;
-        const used = updatedOfficer.leadsSentThisMonth;
+
+        const updated = (await ref.get()).data();
+        const maxLeads = QUOTA[updated.subscriptionType] || 0;
+        const used = updated.leadsSentThisMonth;
 
         if (used >= maxLeads - 1) {
           const alertMsg = {
@@ -166,24 +193,28 @@ try {
               name: "Texas Mortgage Leads",
             },
             replyTo: "texasmortgagelead@gmail.com",
-            subject: "🚨 You're about to hit your lead limit!!!",
+            subject: "🚨 You’re nearly at your lead limit!",
             html: `
-<p>Hi there,</p>
-<p>You've received <strong>${used}</strong> of your <strong>${maxLeads}</strong> leads on your current plan.</p>
-<p>Once you hit your limit, new leads will be paused — and we don’t want you to miss a single opportunity!.</p>
-<p><a href="https://www.texasmortgagelead.com/login" style="background:#007BFF;color:#fff;padding:10px 15px;border-radius:5px;text-decoration:none;">Visit your <strong>Dashboard</strong> To 🔼 Upgrade Your Plan after your last lead is submitted.</a></p>
-<p>Thanks for being part of Texas Mortgage Leads!</p>
-<p style="font-size: 13px; color: #666;">This message was sent from a monitored system. Need help? Just reply to this email.</p>
-  `,
+<p>Hi,</p>
+<p>You’ve used <strong>${used}</strong> of your <strong>${maxLeads}</strong> monthly leads.</p>
+<p>After you hit your limit, new leads will be paused.</p>
+<p>
+  <a href="https://www.texasmortgagelead.com/login"
+     style="background:#007BFF;color:#fff;padding:10px;border-radius:5px;text-decoration:none;">
+    Upgrade your plan now
+  </a>
+</p>
+<p>Thanks for partnering with us!</p>
+          `,
           };
-
           await sgMail.send(alertMsg);
         }
       }
 
+      console.log("✅ sendLeadToOfficer completed successfully.");
       return { success: true, routedTo: selected.email };
-    } catch (err) {
-      console.error("🔥 Lead dispatch error:", err.message);
+    } catch (error) {
+      console.error("🔥 sendLeadToOfficer error:", error);
       throw new functions.https.HttpsError("internal", "Failed to route lead.");
     }
   }
