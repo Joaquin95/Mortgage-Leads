@@ -11,24 +11,28 @@ exports.handlePayPalOrder = functions.https.onCall(async (data, context) => {
       "Must be logged in"
     );
   }
-
-  const userId = auth.uid;
-  const planType = subscriptionType;
   const quotaMap = { basic: 3, standard: 6, premium: 10 };
-  const monthlyQuota = quotaMap[planType.toLowerCase()] || 0;
+
+  const planTypeRaw = subscriptionType;
+  const planType =
+    planTypeRaw.charAt(0).toUpperCase() + planTypeRaw.slice(1).toLowerCase(); 
+  const monthlyQuota = quotaMap[planTypeRaw.toLowerCase()]; 
+
   console.log(
-    "💵 handlePayPalOrder firing for user:",
-    userId,
-    "plan:",
+    "💵 PayPal Order for user:",
+    auth.uid,
+    "planTypeRaw:",
+    planTypeRaw,
+    "normalized PlanType:",
     planType,
-    "quota:",
+    "monthlyQuota:",
     monthlyQuota
   );
 
   await admin.firestore().collection("loanOfficers").doc(auth.uid).set(
     {
       email,
-      subscriptionType,
+      subscriptionType: planType,
       monthlyQuota,
       leadsSentThisMonth: 0,
       subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
