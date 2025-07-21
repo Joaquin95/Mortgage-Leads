@@ -1,19 +1,25 @@
-const functions = require("firebase-functions");
-const { sendLeadEmail } = require("./sendLeadEmail");
+const functions          = require("firebase-functions");
 const { sendLeadToOfficer } = require("./sendLeadToOfficer");
-const sgMail = require("@sendgrid/mail");
-const admin = require("./initAdmin");
-const { handlePayPalOrder } = require("./handlePayPalOrder");
+const { handlePayPalOrder  } = require("./handlePayPalOrder");
+const { sendLeadEmail      } = require("./sendLeadEmail");
+const { onOfficerCreate    } = require("./officerTriggers");
+const sgMail             = require("@sendgrid/mail");
+const admin              = require("./initAdmin");
+
 
 sgMail.setApiKey(functions.config().sendgrid.key);
 
-exports.sendLeadToOfficer = sendLeadToOfficer;
-exports.sendLeadEmail = sendLeadEmail;
-exports.handlePayPalOrder = handlePayPalOrder;
+
+exports.sendLeadToOfficer     = sendLeadToOfficer;
+exports.handlePayPalOrder     = handlePayPalOrder;
+exports.sendLeadEmail         = sendLeadEmail;
+exports.onOfficerCreate       = onOfficerCreate;
+
+
 
 exports.sendOfficerWelcomeEmail = functions.auth.user().onCreate(async (user) => {
-  const officerDoc = await admin.firestore().collection("loanOfficers").doc(user.uid).get();
-  const nmls = officerDoc.data()?.nmls || "Not provided";
+  const doc = await admin.firestore().collection("loanOfficers").doc(user.uid).get();
+  const nmls = doc.data()?.nmls || "Not provided";
 
   const msg = {
     to: user.email,
