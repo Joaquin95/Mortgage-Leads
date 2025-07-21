@@ -1,20 +1,16 @@
 const functions = require("firebase-functions");
-const { createCheckoutSession } = require("./createCheckoutSession");
 const { sendLeadEmail } = require("./sendLeadEmail");
-const { handleStripeWebhook } = require("./handleStripeWebhook");
 const { sendLeadToOfficer } = require("./sendLeadToOfficer");
 const sgMail = require("@sendgrid/mail");
 const admin = require("./initAdmin");
+const { handlePayPalOrder } = require("./handlePayPalOrder");
 
 sgMail.setApiKey(functions.config().sendgrid.key);
 
 exports.sendLeadToOfficer = sendLeadToOfficer;
-exports.createCheckoutSession = createCheckoutSession;
 exports.sendLeadEmail = sendLeadEmail;
-exports.handleStripeWebhook = handleStripeWebhook;
+exports.handlePayPalOrder = handlePayPalOrder;
 
-
-// ✅ New Welcome Email Function
 exports.sendOfficerWelcomeEmail = functions.auth.user().onCreate(async (user) => {
   const officerDoc = await admin.firestore().collection("loanOfficers").doc(user.uid).get();
   const nmls = officerDoc.data()?.nmls || "Not provided";

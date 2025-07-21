@@ -15,10 +15,9 @@
   "dependencies": {
     "@sendgrid/mail": "^8.1.5",
     "firebase-admin": "^11.11.1",
-    "firebase-functions": "^3.23.0",
-    "stripe": "^12.11.0"
+    "firebase-functions": "^3.23.0"
   },
-   "overrides": {
+  "overrides": {
     "google-gax": {
       "protobufjs": "7.2.5"
     }
