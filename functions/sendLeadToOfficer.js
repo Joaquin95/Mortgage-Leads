@@ -1,17 +1,16 @@
-// functions/sendLeadToOfficer.js
-
 const functions = require("firebase-functions");
 const admin = require("./initAdmin");
 const sgMail = require("@sendgrid/mail");
 
 sgMail.setApiKey(functions.config().sendgrid.api_key);
 
-// Your plan quotas and number of shards
+
 const QUOTA = { Basic: 3, Standard: 6, Premium: 10 };
 const TOTAL_SHARDS = 10;
 
 exports.sendLeadToOfficer = functions.https.onCall(
   async (leadData, context) => {
+  
     const {
       name,
       email: customerEmail,
@@ -32,58 +31,66 @@ exports.sendLeadToOfficer = functions.https.onCall(
     const fallbackEmail = "mintinvestments95@gmail.com";
 
     try {
-      // 1) Pick a random shard
+     
       const shard = Math.floor(Math.random() * TOTAL_SHARDS);
       console.log(`🔍 Chosen shard: ${shard}`);
 
-      // 2) Query officers in that shard
       const snap = await admin
         .firestore()
         .collection("loanOfficers")
         .where("shardId", "==", shard)
         .get();
+
       console.log(
         `📂 Officers in shard (${snap.size}):`,
         snap.docs.map((d) => ({
           id: d.id,
           email: d.data().email,
           subscriptionType: d.data().subscriptionType,
+          shardIdType: typeof d.data().shardId,
         }))
       );
 
-      // 3) Filter by active subscription & under quota
+      
       const eligible = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
+        .map((d) => {
+          const data = d.data();
+         
+          if (typeof data.shardId === "string") {
+            data.shardId = parseInt(data.shardId, 10);
+          }
+          return { id: d.id, ...data };
+        })
         .filter((o) => {
           const maxLeads = QUOTA[o.subscriptionType] || 0;
           const ok = o.subscriptionType && o.leadsSentThisMonth < maxLeads;
           console.log(
-            `   ➤ Checking ${o.email}: used ${o.leadsSentThisMonth}/${maxLeads} → ${ok}`
+            `   ➤ Checking ${o.email}:`,
+            `type=${o.subscriptionType}`,
+            `used=${o.leadsSentThisMonth}/${maxLeads}`,
+            `→ ${ok}`
           );
           return ok;
         });
+
       console.log(
         `✅ Eligible after filter:`,
         eligible.map((o) => o.email)
       );
 
-      // 4) Sort by percent-of-quota used (ascending)
+      
       eligible.sort((a, b) => {
         const aPct = a.leadsSentThisMonth / QUOTA[a.subscriptionType];
         const bPct = b.leadsSentThisMonth / QUOTA[b.subscriptionType];
         return aPct - bPct;
       });
-      console.log(
-        `🎯 Selected candidate:`,
-        eligible.length ? eligible[0].email : fallbackEmail
-      );
 
-      // 5) Final selection
       const selected = eligible.length
         ? eligible[0]
         : { id: null, email: fallbackEmail };
 
-      // 6) Build and send email to the officer
+      console.log(`🎯 Selected candidate: ${selected.email}`);
+
       const officerMsg = {
         to: selected.email,
         from: {
@@ -100,21 +107,18 @@ exports.sendLeadToOfficer = functions.https.onCall(
   <li><strong>Phone:</strong> ${phone}</li>
   <li><strong>City:</strong> ${city}</li>
   <li><strong>Loan Type:</strong> ${loanType}</li>
-  <li><strong>Loan Amount:</strong> ${loanAmount}</li>
+  <li><strong>Amount:</strong> ${loanAmount}</li>
   <li><strong>ZIP:</strong> ${zip}</li>
   <li><strong>Credit Score:</strong> ${creditScore}</li>
   <li><strong>Property Type:</strong> ${propertyType}</li>
   <li><strong>Occupancy:</strong> ${occupancy}</li>
-  <li><strong>First-time Homebuyer?:</strong> ${homeBuyerType}</li>
+  <li><strong>First-time Buyer?:</strong> ${homeBuyerType}</li>
 </ul>
 <p>🔗 Routed to: <strong>${selected.email}</strong></p>
-<p style="background:#007BFF;color:#fff;padding:10px;border-radius:5px;display:inline-block;">
-  🔑 Login to your dashboard to follow up with this lead.
-</p>
       `,
       };
 
-      // 7) Thank-you email to the customer
+      
       const clientMsg = {
         to: customerEmail,
         from: {
@@ -148,7 +152,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
       await sgMail.send(officerMsg);
       await sgMail.send(clientMsg);
 
-      // 8) Record the lead in Firestore
+   
       await admin.firestore().collection("leads").add({
         name,
         email: customerEmail,
@@ -163,7 +167,6 @@ exports.sendLeadToOfficer = functions.https.onCall(
         homeBuyerType,
         officerEmail: selected.email,
         status: "New",
-        notes: "",
         tasks: [],
         utmSource,
         utmMedium,
@@ -171,7 +174,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // 9) Increment officer’s usage and send near-limit alert if needed
+
       if (selected.id) {
         const ref = admin
           .firestore()
@@ -183,10 +186,8 @@ exports.sendLeadToOfficer = functions.https.onCall(
 
         const updated = (await ref.get()).data();
         const maxLeads = QUOTA[updated.subscriptionType] || 0;
-        const used = updated.leadsSentThisMonth;
-
-        if (used >= maxLeads - 1) {
-          const alertMsg = {
+        if (updated.leadsSentThisMonth >= maxLeads - 1) {
+          await sgMail.send({
             to: selected.email,
             from: {
               email: "noreply@texasmortgagelead.com",
@@ -194,27 +195,16 @@ exports.sendLeadToOfficer = functions.https.onCall(
             },
             replyTo: "texasmortgagelead@gmail.com",
             subject: "🚨 You’re nearly at your lead limit!",
-            html: `
-<p>Hi,</p>
-<p>You’ve used <strong>${used}</strong> of your <strong>${maxLeads}</strong> monthly leads.</p>
-<p>After you hit your limit, new leads will be paused.</p>
-<p>
-  <a href="https://www.texasmortgagelead.com/login"
-     style="background:#007BFF;color:#fff;padding:10px;border-radius:5px;text-decoration:none;">
-    Upgrade your plan now
-  </a>
-</p>
-<p>Thanks for partnering with us!</p>
-          `,
-          };
-          await sgMail.send(alertMsg);
+            html: `<p>You’ve used ${updated.leadsSentThisMonth}/${maxLeads} leads. Upgrade soon!</p>`,
+          });
         }
       }
 
       console.log("✅ sendLeadToOfficer completed successfully.");
       return { success: true, routedTo: selected.email };
     } catch (error) {
-      console.error("🔥 sendLeadToOfficer error:", error);
+      console.error("🔥 sendLeadToOfficer error:", error.message);
+      console.error(error.stack);
       throw new functions.https.HttpsError("internal", "Failed to route lead.");
     }
   }
