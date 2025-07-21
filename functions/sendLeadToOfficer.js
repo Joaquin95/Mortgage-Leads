@@ -29,24 +29,36 @@ exports.sendLeadToOfficer = functions.https.onCall(
       Standard: 6,
       Premium: 10,
     };
+     const TOTAL_SHARDS = 10;
 
-    try {
-      const snap = await admin.firestore().collection("loanOfficers").get();
+try {
+      // 1. Pick a random shard
+  const shard = Math.floor(Math.random() * TOTAL_SHARDS);
 
-      const eligible = snap.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((o) => {
-          const maxLeads = quota[o.subscriptionType] || 0;
-          return (
-            o.subscriptionType !== "unknown" && o.leadsSentThisMonth < maxLeads
-          );
-        });
+  // 2. Fetch that shard of officers
+  const snap = await admin.firestore()
+    .collection('loanOfficers')
+    .where('shardId', '==', shard)
+    .get();
 
-      const selected = eligible.length
-        ? eligible.sort(
-            (a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth
-          )[0]
-        : { id: null, email: fallbackEmail };
+  // 3. Filter by active subscription & under quota
+  const eligible = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(o => {
+      const max = quota[o.subscriptionType] || 0;
+      return o.subscriptionType && o.leadsSentThisMonth < max;
+    });
+
+  // 4. Sort by weighted usage
+  eligible.sort((a, b) => 
+    (a.leadsSentThisMonth / quota[a.subscriptionType])
+    (b.leadsSentThisMonth / quota[b.subscriptionType])
+  );
+
+  // 5.  Select top candidate or fallback
+  const selected = eligible.length
+    ? eligible[0]
+    : { id: null, email: fallbackEmail };
 
       const msg = {
         to: selected.email,
@@ -141,7 +153,6 @@ exports.sendLeadToOfficer = functions.https.onCall(
         await officerRef.update({
           leadsSentThisMonth: admin.firestore.FieldValue.increment(1),
         });
-
         const updatedSnap = await officerRef.get();
         const updatedOfficer = updatedSnap.data();
         const maxLeads = quota[updatedOfficer.subscriptionType] || 0;
