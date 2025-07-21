@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../services/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { auth, db,} from "../services/firebase";
+import { doc, setDoc,  serverTimestamp } from "firebase/firestore";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import ReactGA from "react-ga4";
@@ -55,19 +55,24 @@ const OfficerSignup = () => {
       setLoading(true);
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
-      await setDoc(doc(db, "loanOfficers", res.user.uid), {
-        email,
-        firstName,
-        lastName,
-        phone,
-        nmls,
-        subscriptionType: "unknown",
-        subscription: null,
-        monthlyQuota: 0,
-        leadsSentThisMonth: 0,
-        notes: "",
-        subscribedAt: null,
-      });
+      await setDoc(
+        doc(db, "loanOfficers", res.user.uid),
+        {
+          email,
+          firstName,
+          lastName,
+          phone,
+          nmls,
+          subscriptionType: "Standard",
+          subscription: null,
+          monthlyQuota: 6,
+          leadsSentThisMonth: 0,
+          notes: "",
+          subscribedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
       ReactGA.event({
         category: "Officer",
         action: "Signup",
