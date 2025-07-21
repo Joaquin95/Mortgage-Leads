@@ -9,63 +9,72 @@ const ChoosePlan = () => {
   const functions = getFunctions(app);
   const handlePayPalOrder = httpsCallable(functions, "handlePayPalOrder");
 
-   useEffect(() => {
-    if (!currentUser) return;
-
+  const loadPayPalScript = () => {
+    if (window.paypal) return;
     const script = document.createElement("script");
-    script.src = "https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD";
+    script.src =
+      "https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"; 
     script.async = true;
-    script.onload = () => {
-      const priceMap = {
-        basic: "29.99",
-        standard: "59.99",
-        premium: "99.99",
-      };
-
-      ["basic", "standard", "premium"].forEach((plan) => {
-        if (document.getElementById(`paypal-button-${plan}`)?.hasChildNodes()) return;
-
-        window.paypal
-          .Buttons({
-            createOrder: (data, actions) => {
-              return actions.order.create({
-                purchase_units: [{ amount: { value: priceMap[plan] } }],
-              });
-            },
-            onApprove: async (data, actions) => {
-              const order = await actions.order.capture();
-              console.log("✅ PayPal order approved:", order);
-
-              ReactGA.event({
-                category: "Subscription",
-                action: "Purchased via PayPal",
-                label: plan,
-                value: parseFloat(priceMap[plan]),
-              });
-
-              try {
-                await handlePayPalOrder({
-                  orderID: order.id,
-                  email: currentUser.email,
-                  subscriptionType: plan,
-                });
-                alert(`Subscription activated: ${plan} plan`);
-              } catch (err) {
-                console.error("🔥 Firebase update failed:", err);
-                alert("Something went wrong storing your subscription.");
-              }
-            },
-            onError: (err) => {
-              console.error("💥 PayPal error:", err);
-              alert("Payment failed. Please try again.");
-            },
-          })
-          .render(`#paypal-button-${plan}`);
-      });
-    };
     document.body.appendChild(script);
-  }, [currentUser]);
+  };
 
+  useEffect(() => {
+    loadPayPalScript();
+  }, []);
+
+  const handleSubscribe = async (plan) => {
+    if (!currentUser) {
+      alert("Please log in to subscribe.");
+      return;
+    }
+
+    const priceMap = {
+      basic: "29.99",
+      standard: "59.99",
+      premium: "99.99",
+    };
+
+    ReactGA.event({
+      category: "Subscription",
+      action: "Clicked Plan",
+      label: plan,
+      value: parseFloat(priceMap[plan]),
+    });
+
+    if (!window.paypal) {
+      alert("PayPal script not loaded.");
+      return;
+    }
+
+    window.paypal
+      .Buttons({
+        createOrder: (data, actions) =>
+          actions.order.create({
+            purchase_units: [{ amount: { value: priceMap[plan] } }],
+          }),
+        onApprove: async (data, actions) => {
+          const order = await actions.order.capture();
+          console.log("✅ Approved:", order);
+
+          try {
+            await handlePayPalOrder({
+              orderID: order.id,
+              email: currentUser.email,
+              subscriptionType: plan,
+            });
+            alert(`Subscription activated: ${plan} plan`);
+          } catch (err) {
+            console.error("🔥 Firebase error:", err);
+            alert("Error storing subscription.");
+          }
+        },
+        onError: (err) => {
+          console.error("💥 PayPal error:", err);
+          alert("Payment failed. Try again.");
+        },
+      })
+      .render(`#paypal-button-container`);
+  };
 
   return (
     <div className="plan-options p-6 bg-slate-700 rounded-lg shadow-lg text-white">
@@ -74,26 +83,27 @@ const ChoosePlan = () => {
         Select a plan below to start receiving high-intent Texas mortgage leads.
       </p>
 
-     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-  <div className="plan-button green px-4 py-3 rounded-lg">
-    <h4 className="text-lg font-bold mb-2">Basic Plan</h4>
-    <p>3 Leads — $29.99</p>
-    <div id="paypal-button-basic"></div>
-  </div>
-
-  <div className="plan-button blue px-4 py-3 rounded-lg">
-    <h4 className="text-lg font-bold mb-2">Standard Plan</h4>
-    <p>6 Leads — $59.99</p>
-    <div id="paypal-button-standard"></div>
-  </div>
-
-  <div className="plan-button purple px-4 py-3 rounded-lg">
-    <h4 className="text-lg font-bold mb-2">Premium Plan</h4>
-    <p>10 Leads — $99.99</p>
-    <div id="paypal-button-premium"></div>
-  </div>
-</div>
-</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button
+          onClick={() => handleSubscribe("basic")}
+          className="plan-button green px-4 py-3 rounded-lg"
+        >
+          Basic Plan (3 Leads $29.99)
+        </button>
+        <button
+          onClick={() => handleSubscribe("standard")}
+          className="plan-button blue px-4 py-3 rounded-lg"
+        >
+          Standard Plan (6 Leads $59.99)
+        </button>
+        <button
+          onClick={() => handleSubscribe("premium")}
+          className="plan-button purple px-4 py-3 rounded-lg"
+        >
+          Premium Plan (10 Leads $99.99)
+        </button>
+      </div>
+    </div>
   );
 };
 
