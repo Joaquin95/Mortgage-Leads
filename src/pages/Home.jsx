@@ -68,6 +68,13 @@ const Home = () => {
           Get personalized quotes,from our vetted Loan officers and unlock your
           buying power. Just clear and honest offers.
         </p>
+        <p className="mt-4 text-lg">
+          Whether you're looking to <strong>get a mortgage quote</strong> or
+          you're a loan officer seeking{" "}
+          <strong>verified Texas mortgage leads</strong>, our platform is built
+          to connect the right people at the right time.
+        </p>
+
         <section className="lead-form" data-aos="zoom-in">
           <h2 className="form-heading">Ready to Get Started?</h2>
           <p className="text-center mb-4">
@@ -308,6 +315,28 @@ const Home = () => {
       {/* Trusted */}
       <section className="trusted text-center" data-aos="fade-up">
         <h3>✅ Trusted by Licensed Loan Officers Across Texas</h3>
+      </section>
+
+      {/* Testimonials */}
+      <section className="testimonials bg-white p-6 rounded shadow-md max-w-2xl mx-auto text-center">
+        <h3 className="text-xl font-semibold mb-4">
+          What Loan Officers Are Saying -
+        </h3>
+
+        <div className="testimonial mb-4">
+          <h2 className="italic">
+            "I got my first 3 leads within 24 hours. The quality was better than
+            anything I’ve seen on Facebook or LendingTree."{" "}
+          </h2>
+          <p className="mt-2 font-bold">– Sarah V., Dallas TX</p>
+        </div>
+
+        <div className="testimonial">
+          <h2 className="italic">
+            "Easy to use, fast setup, and the leads are genuinely motivated."{" "}
+          </h2>
+          <p className="mt-2 font-bold">– Marcus L., Austin TX</p>
+        </div>
       </section>
 
       {/* CONTACT */}

@@ -208,7 +208,9 @@ const OfficerSignup = () => {
             out-of-state tire-kickers.
           </li>
           <li> 🤝No contracts, no per-lead fees—cancel anytime.</li>
+         🤝 Join loan officers across Texas who use TexasMortgageLead.com to <strong>buy high-intent homebuyer leads</strong> and grow their pipeline.
         </ul>
+        
       </section>
 
       <section className="signup-how">
