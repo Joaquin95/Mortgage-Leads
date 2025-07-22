@@ -193,20 +193,15 @@ const OfficerSignup = () => {
             first crack at every contact.
           </li>
           <li>
-            💰 Flat-Rate, Predictable Pricing One simple monthly fee, no
+            💰 Flat-Rate, Predictable Pricing simple subscription fee, no
             per-lead nickel-and-diming.
           </li>
           <li>
-            🤝 Instant CRM & Email Delivery Webhooks or Zapier—leads hit your
+            🤝 Instant CRM & Email Deliveries hit your
             inbox and your pipeline in real-time.
           </li>
           <li>
-            ✅ Built-in Compliance & Reporting Fully RESPA-safe, NMLS-ready
-            disclosures, and straightforward performance metrics.
-          </li>
-          <li>
-            📈 Proven Conversion Tools Dashboard reminders, status updates, and
-            email templates to turn more clicks into applications.
+            📈 Proven Conversion Tools Dashboard reminders, status updates.
           </li>
           <li>
             🏆 Texas-Only, Hyper-Local Focus Leads only from Texas zip codes—no
