@@ -421,7 +421,10 @@ textarea::placeholder {
 .text-center {
   text-align: center;
 }
-
+.why-content p {
+  text-align: center;
+  margin: 0 auto;
+}
 .mb-4 {
   margin-bottom: 1rem;
 }
