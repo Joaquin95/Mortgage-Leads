@@ -44,11 +44,7 @@ exports.sendLeadToOfficer = functions.https.onCall(
 
       console.log(`✅ Eligible count: ${eligible.length}`);
 
-      eligible.sort((a, b) => {
-        const pctA = a.leadsSentThisMonth / (QUOTA[a.subscriptionType] || 1);
-        const pctB = b.leadsSentThisMonth / (QUOTA[b.subscriptionType] || 1);
-        return pctA - pctB;
-      });
+      eligible.sort((a, b) => a.leadsSentThisMonth - b.leadsSentThisMonth);
 
       const selected = eligible.length
         ? eligible[0]
