@@ -223,8 +223,8 @@ const OfficerSignup = () => {
           <li>
             <strong>
               {" "}
-              Set Your Preferences Choose between three, six or ten monthly
-              leads for your pipeline.
+              Set Your Preferences Choose between three, six or ten
+              leads for your pipeline - No refunds.
             </strong>
           </li>
           <li>
