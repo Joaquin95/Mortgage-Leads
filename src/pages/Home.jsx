@@ -86,38 +86,50 @@ const Home = () => {
           🧠 What Is a Mortgage Quote?
         </h2>
         <p className="text-lg leading-relaxed mb-6">
-          A mortgage quote estimates how much you could borrow, your interest
-          rate, and what your monthly payment might look like before you apply.
+          <strong>
+            A mortgage quote estimates how much you could borrow, your interest
+            rate, and what your monthly payment might look like before you
+            apply.
+          </strong>
         </p>
         <div className="bg-slate-700 p-4 rounded-lg shadow-md text-slate-100">
           <h3 className="text-xl font-semibold mb-2">Popular Loan Programs:</h3>
 
-          <p className="mb-4">
+          <h3 className="mb-4">
             <strong className="text-blue-300">🏠 Conventional Loan:</strong>
             <br />
-            Perfect for borrowers with strong credit and stable income.
-            Typically requires at least <strong>3% down</strong> and offers
-            competitive rates.
-          </p>
+            <span className="block mt-8">
+              Perfect for borrowers with strong credit and stable income.
+              Typically requires at least <strong>3% down</strong> and offers
+              competitive rates.
+            </span>
+          </h3>
 
-          <p className="mb-4">
-            <strong className="text-green-300">🛡️ FHA Loan:</strong>
-            <br />
-            Backed by the government and ideal for first-time buyers or credit
-            scores under 680. Lower down payments, flexible qualifying terms.
-          </p>
+          <h3 className="mb-4">
+            <span className="block mt-8">
+              <strong className="text-green-300">🛡️ FHA Loan:</strong>
+              <br />
+              Backed by the government and ideal for first-time buyers or credit
+              scores under 680. Lower down payments, flexible qualifying terms.
+            </span>
+          </h3>
 
-          <p className="mb-4">
+          <h3 className="mb-4">
             <strong className="text-yellow-300">🎖️ VA Loan:</strong>
             <br />
-            Available for veterans and active military. Requires{" "}
-            <strong>$0 down</strong>, includes favorable interest rates, and no
-            private mortgage insurance.
-          </p>
+            <span className="block mt-8">
+              Available for veterans and active military. Requires{" "}
+              <strong>$0 down</strong>, includes favorable interest rates, and
+              no private mortgage insurance.
+            </span>
+          </h3>
 
-          <p className="text-lg mt-6">
-            Our officers are professional and Licensed to walk you through each
-            program and help compare options based on your goals and finances.
+          <p className="mb-4">
+            <span className="block mt-8">
+              Our officers are professional and Licensed to walk you through
+              each program and help compare options based on your goals and
+              finances.
+            </span>
           </p>
 
           <Link to="/leadform">
