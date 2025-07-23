@@ -4,6 +4,7 @@ import { app } from "../services/firebase";
 import { useAuth } from "../services/useAuth";
 import ReactGA from "react-ga4";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const priceMap = {
   basic: "29.99",
@@ -22,6 +23,7 @@ export default function ChoosePlan({ mandatory = false }) {
   const functions = getFunctions(app);
   const handlePayPalOrder = httpsCallable(functions, "handlePayPalOrder");
   const clientId = process.env.REACT_APP_PAYPAL_CLIENT_ID;
+  const analytics = getAnalytics(app);
 
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -35,6 +37,10 @@ export default function ChoosePlan({ mandatory = false }) {
       });
       alert(`Subscription activated: ${plan} plan`);
       setShowModal(false);
+      logEvent(analytics, "subscribe_success", {
+        plan: plan,
+        value: parseFloat(priceMap[plan]),
+      });
     } catch (err) {
       console.error("🔥 Firebase error:", err);
       alert("Error storing subscription.");
@@ -73,8 +79,7 @@ export default function ChoosePlan({ mandatory = false }) {
             <div key={plan} className="flex flex-col items-center gap-4">
               <button
                 onClick={() => {
-                  if (!currentUser)
-                    return alert("Please log in to subscribe.");
+                  if (!currentUser) return alert("Please log in to subscribe.");
                   ReactGA.event({
                     category: "Subscription",
                     action: "Clicked Plan",
@@ -109,8 +114,9 @@ export default function ChoosePlan({ mandatory = false }) {
             </h4>
             <p className="mb-4">
               You selected the{" "}
-              <span className="font-medium capitalize">{selectedPlan}</span> plan – $
-              {priceMap[selectedPlan]}. Click below to complete your subscription.
+              <span className="font-medium capitalize">{selectedPlan}</span>{" "}
+              plan – ${priceMap[selectedPlan]}. Click below to complete your
+              subscription.
             </p>
             <div className="w-full">{renderButtons(selectedPlan)}</div>
             <button
