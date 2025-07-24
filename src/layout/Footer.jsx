@@ -20,9 +20,13 @@ export default function Footer() {
         TexasMortgageLead.com is a lead generation platform that connects Texas
         consumers with licensed mortgage loan officers. We do not take
         applications, make credit decisions, or offer loan terms. We do not
-        provide mortgage advice, lending services, or financial recommendations.
-        All loan inquiries are forwarded to licensed professionals. Not
-        affiliated with any government agency.
+        provide mortgage advice, lending services, or financial
+        recommendations.We may receive compensation from licensed loan officers
+        in the form of flat-rate lead package subscriptions. This compensation
+        is not tied to loan approvals, closings, or funding outcomes. We do not
+        endorse or recommend any specific loan officer or lender. All loan
+        inquiries are forwarded to licensed professionals. Not affiliated with
+        any government agency.
       </p>
     </footer>
   );

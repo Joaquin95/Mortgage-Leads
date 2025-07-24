@@ -24,7 +24,7 @@ const LeadForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const source = params.get("utm_source");
     const medium = params.get("utm_medium");
@@ -37,7 +37,6 @@ const LeadForm = () => {
       utmCampaign: campaign || "none",
     }));
   }, []);
-
 
   const texasZipRanges = [
     [75001, 79999],
@@ -272,6 +271,12 @@ const LeadForm = () => {
       >
         {loading ? "Sending..." : "🚀 Get my Mortgage Quote"}
       </button>
+
+      <p>
+        By submitting this form, you agree to be contacted by a licensed
+        mortgage loan officer in Texas in response to your inquiry.Submission
+        does not constitute a loan application or approval.
+      </p>
     </form>
   );
 };
