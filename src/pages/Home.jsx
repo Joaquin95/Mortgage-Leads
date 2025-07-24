@@ -85,6 +85,24 @@ const Home = () => {
               📋 Get My Free Mortgage Quote
             </button>
           </Link>
+           <p className="text-center mb-4">
+             💼 I'm a Loan Officer - Sign up and choose your plan.
+          </p>
+           <Link to="/officer-leads">
+          <button
+            className="cta-button"
+            onClick={() =>
+              ReactGA.event({
+                category: "Lead",
+                action: "Clicked Texasmortgageleads.com CTA",
+                label: "Home Page Hero",
+                value: 1,
+              })
+            }
+          >
+            🚀 Join TexasMortgageLeads.com
+          </button>
+        </Link>
         </section>
       </div>
 
