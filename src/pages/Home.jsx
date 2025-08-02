@@ -100,7 +100,7 @@ const Home = () => {
               })
             }
           >
-            🚀 Join TexasMortgageLeads.com
+            🚀 Join TexasMortgageLead.com
           </button>
         </Link>
         </section>
