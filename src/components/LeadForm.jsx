@@ -79,10 +79,21 @@ const LeadForm = () => {
       return;
     }
 
+    if (!formData.email || !formData.email.includes("@")) {
+      alert("❌ Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    console.log("📤 Submitting lead:", formData);
+
     try {
       const functions = getFunctions(app);
       const sendLeadToOfficer = httpsCallable(functions, "sendLeadToOfficer");
-      await sendLeadToOfficer(formData);
+      const result = await sendLeadToOfficer(formData);
+
+      console.log("✅ Lead routed to:", result.data?.routedTo || "unknown");
+
       ReactGA.event({
         category: "Lead",
         action: "Submitted",
