@@ -7,6 +7,13 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import ReactGA from "react-ga4";
 
+const quotaMap = {
+  basic: 3,
+  standard: 6,
+  premium: 10,
+};
+
+
 const OfficerSignup = () => {
   const [email, setEmail] = useState("");
   const [nmls, setNMLS] = useState("");
@@ -18,6 +25,7 @@ const OfficerSignup = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState("basic");
 
   useEffect(() => {
     AOS.init({ duration: 800 });
@@ -55,7 +63,7 @@ const OfficerSignup = () => {
       setLoading(true);
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
-      await setDoc(
+    await setDoc(
         doc(db, "loanOfficers", res.user.uid),
         {
           email,
@@ -63,15 +71,17 @@ const OfficerSignup = () => {
           lastName,
           phone,
           nmls,
-          subscriptionType: "Standard",
+          subscriptionType: selectedPlan,
           subscription: null,
-          monthlyQuota: 6,
+          monthlyQuota: quotaMap[selectedPlan],
           leadsSentThisMonth: 0,
           notes: "",
           subscribedAt: serverTimestamp(),
         },
         { merge: true }
       );
+
+
 
       ReactGA.event({
         category: "Officer",
