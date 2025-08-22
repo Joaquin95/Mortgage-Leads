@@ -21,16 +21,16 @@ exports.sendOfficerWelcomeEmail = functions.auth.user().onCreate(async (user) =>
 
   const msg = {
     to: user.email,
-    from: "mintinvestments95@gmail.com", 
+    from: "Texasmortgagelead@gmail.com", 
     subject: "Welcome to TexasMortgageLeads — Let's Get You Verified",
     html: `
       <div style="font-family: sans-serif; background-color: #f9f9f9; padding: 20px;">
-        <h2 style="color: #2563eb;">Welcome to TexasMortgageLeads.com 🎉</h2>
+        <h2 style="color: #2563eb;">Welcome to TexasMortgageLead.com 🎉</h2>
         <p>Thanks for signing up! Your dashboard is live and ready.</p>
         <p>We'll now verify your NMLS number (${nmls}). This usually takes less than 24 hours.</p>
         <p>Once verified, you'll receive lead access instantly.</p>
         <br />
-        <p>Questions? Contact us at <strong>mintinvestments95@gmail.com</strong></p>
+        <p>Questions? Contact us at <strong>Texasmortgagelead@gmail.com</strong></p>
         <hr />
         <p style="font-size: 14px;">TexasMortgageLeads.com | Verified Loan Officer Network</p>
       </div>

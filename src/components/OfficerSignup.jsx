@@ -104,7 +104,7 @@ const OfficerSignup = () => {
         🎯 Join the Network of Verified Loan Officers
       </h2>
       <p className="text-center mb-4 text-slate-200 text-base leading-relaxed">
-        TexasMortgageLeads.com is built for licensed professionals like you.
+        TexasMortgageLead.com is built for licensed professionals like you.
         Once verified, you'll gain access to high-intent leads, a CRM-style
         dashboard, and flexible quota-based routing. We verify each partner's
         NMLS registration to ensure professionalism and trust.
