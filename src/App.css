@@ -918,3 +918,22 @@ body {
 /* .main-content {
   flex: 1;
 } */
+/* src/pages/ContactUs.css */
+
+
+.contact-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+}
+
+.contact-card {
+  max-width: 400px;
+  width: 100%;
+  padding: 24px;
+  background: #6d8dd6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.868);
+  border-radius: 8px;
+  text-align: center;
+}

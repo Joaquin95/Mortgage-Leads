@@ -17,6 +17,8 @@ import TermsOfUse from "./pages/TermsOfUse";
 import ReactGA from "react-ga4";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import ContactUs from "./pages/ContactUs";
+
 
 ReactGA.initialize("G-BW7QVTF32X");
 ReactGA.send("pageview");
@@ -38,6 +40,8 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/leadform" element={<LeadForm />} />
       <Route path="/login" element={<OfficerLogin />} />
+      <Route path="/contact" element={<ContactUs />} />
+
       <Route path="/privacy" element={<PrivacyPolicy />} />;
       <Route path="/terms" element={<TermsOfUse />} />;
       <Route path="/officer-leads" element={<OfficerSignup />} />
