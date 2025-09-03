@@ -1,6 +1,6 @@
 export default function ContactUs() {
   const email = "Texasmortgagelead@gmail.com";
-  const phone = "214-518-1437";
+  const phone = "(972) 275-6719";
   const facebookUrl = "https://www.facebook.com/profile.php?id=61579933152558";
 
   return (
